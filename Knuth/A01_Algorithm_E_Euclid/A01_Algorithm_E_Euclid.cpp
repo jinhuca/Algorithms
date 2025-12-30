@@ -1,6 +1,5 @@
-// A01_Algorithm_E_Euclid.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// A01_Algorithm_E_Euclid.cpp
 import std;
-//#include "Header.h"
 import Euclid_AlgorithmE;
 
 int main() {
