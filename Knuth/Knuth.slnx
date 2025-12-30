@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="A01_Algorithm_E_Euclid/A01_Algorithm_E_Euclid.vcxproj" Id="44ef7dd3-7a47-4857-97b1-a793dcc0713c" />
+</Solution>
