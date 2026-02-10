@@ -2,13 +2,24 @@
 export module Euclid_AlgorithmE;
 import std;
 
-export template<typename T>
-concept positive_integral = std::integral<T> && requires (T val) {
-  { val > 0 } -> std::same_as<bool>;
-};
+namespace Euclid_AlgorithmE {
+  export template <typename T>
+    //concept PositiveIntegral = std::integral<T>; // && (T() > 0);
+    concept PositiveIntegral = std::integral<T>
+    && requires(T a) { a > 0 == true; };
 
-export template<typename T>
-  requires positive_integral<T>
-T GCD(T a, T b) {
-  return b == 0 ? a : GCD(b, a % b);
-}
+  export template<typename T>
+    requires PositiveIntegral<T>
+  T GCD(T a, T b) {
+    return b == 0 ? a : GCD(b, a % b);
+  };
+
+  export template<typename T>
+    concept NaturalNumber = std::integral<T> && (T {1} > T {0});
+
+  export template<typename T>
+    requires NaturalNumber<T>
+  T gcd(T a, T b) {
+    return b == 0 ? a : gcd(b, a % b);
+  }
+} // namespace Euclid_AlgorithmE

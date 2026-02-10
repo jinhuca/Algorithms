@@ -1,7 +1,10 @@
 // A01_Algorithm_E_Euclid.cpp
 import std;
 import Euclid_AlgorithmE;
+using namespace Euclid_AlgorithmE;
 
 int main() {
-  std::cout << "GCD(48, 18) = " << GCD(48, 18);
+  int x = 0;
+  int y = 10;
+  std::cout << gcd(x, y);
 }
