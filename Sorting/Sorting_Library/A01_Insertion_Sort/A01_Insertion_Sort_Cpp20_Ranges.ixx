@@ -3,7 +3,9 @@ import std;
 
 namespace A01_Insertion_Sort_Cpp20_Ranges {
   export template<typename T>
-    concept SortableRange = std::ranges::forward_range<T> && std::sortable<std::ranges::iterator_t<T>>;
+    concept SortableRange = std::ranges::forward_range<T> 
+                            && std::sortable<std::ranges::iterator_t<T>>;
+
   export void insertion_sort(SortableRange auto&& range) {
     auto begin = std::ranges::begin(range);
     auto end = std::ranges::end(range);

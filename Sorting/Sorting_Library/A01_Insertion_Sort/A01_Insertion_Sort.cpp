@@ -36,6 +36,7 @@ import A01_Insertion_Sort_Cpp20_Ranges;
 
 void test_Cpp20_Iterators() {
   std::vector<int> data = {5, 2, 9, 1, 5, 6};
+  //std::vector<int> data2 = {3, 8, 7, 4, 2, 1};
   std::cout << "Before sorting: ";
   for(const auto& num : data) {
     std::cout << num << " ";
@@ -44,6 +45,17 @@ void test_Cpp20_Iterators() {
   //A01_Insertion_Sort_Cpp20_Iterators::insertion_sort(data.begin(), data.end());
   std::cout << "\nAfter sorting: ";
   for(const auto& num : data) {
+    std::cout << num << " ";
+  }
+
+  int arr[] = {3, 8, 7, 4, 2, 1};
+  std::cout << "\nBefore sorting array: ";
+  for(const auto& num : arr) {
+    std::cout << num << " ";
+  }
+  A01_Insertion_Sort_Cpp20_Iterators::insertion_sort(std::begin(arr), std::end(arr));
+  std::cout << "\nAfter sorting array: ";
+  for(const auto& num : arr) {
     std::cout << num << " ";
   }
 }
@@ -64,4 +76,5 @@ void test_Cpp20_Ranges() {
 int main() {
   //test_Cpp98();
   test_Cpp20_Iterators();
+  //test_Cpp20_Iterators();
 }

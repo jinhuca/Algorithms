@@ -14,7 +14,7 @@ namespace A01_Insertion_Sort_Cpp20_Iterators {
     if(first == last) return;   // empty range
     for(iterator current = std::next(first); current != last; ++current) {
       // Store the value of the current element to insert
-      typename std::iterator_traits<iterator>::value_type key = std::move(*current);  
+      auto key = std::move(*current);  
       iterator j = current;
       iterator previous = std::prev(j);
       // Shift elements greater than the key to the right
