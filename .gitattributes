@@ -1,4 +1,5 @@
 *.css linguist-detectable=false
 *.html linguist-detectable=false
 *.qml linguist-detectable=false
+qml linguist-detectable=false 
 assets/* linguist-vendored
