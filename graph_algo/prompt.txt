@@ -1,0 +1,45 @@
+generate the API document for fsm::dfa, i.e., how the users to create, initialize, and start dfa, either in svg diagram or other file format.
+
+
+create a qt qml6 project inside D:\exercise\fsm_cpp that it can visualize the creation and running of an fsm::dfa. 
+Users can provide the set of input symbols, states, transition, initial state, and accept states.
+the possible ui layout is attached as fsm_vis_diagram.svg.
+
+For user-input, (1) validate: show warnings for invalid input for (symbols, states, transitions, ...), and (2) normailize: if some inputs are hard to display (e.g., for too long symbol, the diagram only show first characters with dot)
+
+I want to provide user more options for users: re-layout transitions (arrows + lines).
+
+Can we add some animations on states and transitions on Canvas when user "Run" the input?
+e.g., highlight current state, and add some ongoing transition animiation (add some delays/periods). 
+
+make the major regions on UI resizable, and add one option to make drawing canvas full screen.
+
+the initial position and size of app, and the theme (light/dark) seem not save when user shut down the app.
+
+After I launched the app, saved it to generator3_console6. I re-launched the app, the layout was not restore, and input was empty.
+Can we add a text to show the loaded json file.
+
+since we have "modified" indicator, can we add "undo" and "redo" for the layout change?
+
+Animation: should the highlight of the current state be activated / enabled when the transition animation reach the state circle?
+
+After the initial load (i.e., after app launched), the file marked as modified; while the "undo" and "redo" both are disabled, this two statuses seem contradicated.
+
+make app title as next.png, refer to current.png (the current title)
+
+can you plan next steps to improve this fsm visualizer app?
+
+do you think it is time to refactor Main.qml into a set of more readable qml files?
+
+When I dragged one of transition line up, the line broken (upper part dispeared). No matter I zoomed in or out, reset, the issue was still there.
+Only after I re-start the app. I remember you fixed this issue before. Please refer transition_line_dispear.png in this folder.
+
+
+The tooltips on the state and transition line closely overlap the under controls. This pattern makes user hard to see the actual controls.
+Can you move these tooltips somewhere, such as on the upper or lower part of the diagram with fixed position and size.
+
+Since we add export functionality (to C++ definition), can we add import part (import C++ definition of dfa)?
+
+Next: resume the refactor (slice 3 — dialogs), or the PNG-export feature?
+
+create a "Save As" button along with "Save" button with common semantics: "Save" - don't prompt file dialog, while "Save As" - do prompt file dialog with default file name as the original.

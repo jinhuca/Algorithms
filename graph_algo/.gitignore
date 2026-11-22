@@ -1,0 +1,44 @@
+# ---- Build output ----
+build/
+build-*/
+out/
+cmake-build-*/
+x64/
+*.idb
+*.ifc
+*.recipe
+
+# ---- CMake ----
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+CMakeUserPresets.json
+
+# ---- Qt / Qt Creator ----
+*.autosave
+*.qmlc
+*.jsc
+.qtcreator/
+
+# ---- Compiler / linker artifacts ----
+*.o
+*.obj
+*.exe
+*.dll
+*.a
+*.lib
+*.pdb
+
+# ---- Editor / tooling ----
+.vscode/
+.vs/
+.claude/
+
+# ---- Visualizer saved documents / exports ----
+visualizer/examples/*.json
+*.local
+
+/visualizer/part_of_edges.png
+
+.fake

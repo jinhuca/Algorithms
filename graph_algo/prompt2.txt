@@ -1,0 +1,53 @@
+user shall save and load sample data.
+
+load a graph with 20 vertices with sparse edges - 300 MB
+BFS playback - CPU 1.1 - 1.2 %, Memory 370 - 380 GB
+BFS playback, with slight dragged one or two vertices - CPU 1.4 - 1.8 %, Memory 380 - 390 GB
+
+right after app launch, first run for drag-during-run case, the memory consumption (not spike) reached 5GB - 8GB,
+when the run completed, I waited for around 1 minute, the memory came back to 600MB. I re-ran it, almost the same.
+
+Two things observed:
+1. the circle size decreased significantly.
+2. for the first time run, the memory went up to 2GB constantly, waited for 30 secs, it went down to 650MB.
+the later several runs had 600 - 900 MB
+
+I'd like to have some pre-defined sample data and layout for quick tests on different algos.
+can you generate a set of such files so that users can load?
+file 1: vertices - 100, edges - 200, with some unreachable vertices
+file 2: vertices - 200, edges - 400, with some unreachable vertices
+file 3: vertices - 500, edges - 800, with some unreachable vertices
+file 4: vertices - 1000, edges - 1200, with some unreachable vertices
+each file shall have reasonable layouts to allow users easy to see on canvas.
+
+
+1. loading is sync, it makes loading large data file freeze the UI.
+2. Add "Save As" button along current "Save" with precise semantics in fsm_visualizer.
+3. make the size of node circle relative to large sample data.
+4. display summary information of loaded file on Canvas: #vertices, #edges, and file name.
+
+How is the "Speed" defined on the Playback?
+
+"Run" start/re-start the selected algorithm running on the selected sample data, and "Playback" just re-play the algorithm step by step.
+can we adjust the behavior of "Run" as: when user clicks the "Run", do the exactly same thing as now. 
+After it completes, render the nodes and edges so that user can select nodes to check the results (i.e., the path and weight).
+
+when run completes, user selected some nodes to check the results.
+user then clicked playback, the previous selected nodes and paths (highlighted) should be reset.
+
+adjust algorithm pane for the issue on layout_issue.png, we seem to have scrollview for layout.
+b
+
+After algorithm started to run, when is the time for user to re-layout the current sample, e.g., drag nodes? I can't do for now.
+
+I'd like to add auto-layout functionality on sample data, similar reset zooming.
+One of use cases is: when user change the app window or canvas dimension, user may want the layout fit the available canvas region with some margins.
+
+Since we can add nodes on full-screen mode via double-click, we need to enable user to add edges between nodes.
+
+For fsm_visualizer, can you add background grid for canvas, similar with the one at https://danieltongu.github.io/graph-visualizer/
+so that user know the position and layout better. provide a toggle button on canvas to allow user to enable/disable this grid.
+
+if user starts to run on sample_1000, the UI is unusable for a long time. At this time, user's mouse-click would cause warning - either close or wairing.
+
+Try to apply the fix for the UI freezing issue on graph_visualizer repo to fsm_visualizer when user loads large sample data.

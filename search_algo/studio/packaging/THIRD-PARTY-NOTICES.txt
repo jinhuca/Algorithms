@@ -1,0 +1,16 @@
+Search Algorithm Studio — third-party notices
+==============================================
+
+This application is built with the Qt framework (Qt 6) and is distributed
+with Qt's dynamically-linked libraries under the terms of the GNU Lesser
+General Public License, version 3 (LGPLv3).
+
+  Qt:  https://www.qt.io/
+  LGPLv3:  https://www.gnu.org/licenses/lgpl-3.0.html
+
+The Qt libraries are used unmodified. In accordance with the LGPL, the Qt
+runtime is linked dynamically (shipped as separate DLLs alongside the
+application), so it may be replaced with a compatible build of Qt.
+
+The MinGW runtime libraries (libgcc, libstdc++, libwinpthread) are
+distributed under the GCC Runtime Library Exception.

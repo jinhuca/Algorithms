@@ -1,0 +1,64 @@
+module;
+
+// Interpolation search — for sorted, roughly uniformly distributed NUMERIC keys, guess
+// the probe position by linear interpolation between the window ends instead of always
+// taking the midpoint (like opening a phone book near where a name should be, not in the
+// middle). O(log log n) on uniform data, but degrades toward O(n) on skewed data (e.g.
+// gaussian / clustered gaps) — a good contrast to binary search's guaranteed O(log n).
+// Uses value_of() for the arithmetic, so it is meant for numeric element types.
+
+#include <vector>
+
+export module se.sorted_searches.interpolation;
+
+import se.seq;
+import se.trace;
+
+export namespace se {
+
+  template <class T, class Compare = less>
+  index interpolation_search(const std::vector<T>& a, const T& target,
+                             Compare cmp = {}, const tracer& trace = ignore) {
+    const std::size_t n = a.size();
+    if (n == 0) { trace({.kind = evt::not_found, .line = 7}); return nil; }
+
+    std::size_t lo = 0, hi = n - 1;                     // inclusive window [lo, hi]
+    // Keep probing while the target lies within [a[lo], a[hi]].
+    while (lo <= hi && !cmp(target, a[lo]) && !cmp(a[hi], target)) {
+      std::size_t pos;
+      if (lo == hi) {
+        pos = lo;
+      } else {
+        const double alo = value_of(a[lo]), ahi = value_of(a[hi]), t = value_of(target);
+        const double denom = ahi - alo;
+        if (denom == 0.0) {
+          pos = lo;
+        } else {
+          double frac = (t - alo) / denom;
+          if (frac < 0.0) frac = 0.0;
+          if (frac > 1.0) frac = 1.0;
+          pos = lo + static_cast<std::size_t>(frac * static_cast<double>(hi - lo));
+        }
+      }
+      trace({.kind = evt::mid, .i = pos, .value = value_of(a[pos]), .line = 3});
+      trace({.kind = evt::probe, .i = pos, .value = value_of(a[pos]), .line = 3});
+      if (equivalent(a[pos], target, cmp)) {
+        trace({.kind = evt::found, .i = pos, .value = value_of(a[pos]), .line = 4});
+        return pos;
+      }
+      if (cmp(a[pos], target)) {                        // a[pos] < target -> go right
+        trace({.kind = evt::eliminate, .i = lo, .j = pos, .line = 5});
+        lo = pos + 1;
+        trace({.kind = evt::lo_bound, .i = lo, .line = 5});
+      } else {                                          // target < a[pos] -> go left
+        if (pos == 0) break;
+        trace({.kind = evt::eliminate, .i = pos, .j = hi, .line = 6});
+        hi = pos - 1;
+        trace({.kind = evt::hi_bound, .i = hi, .line = 6});
+      }
+    }
+    trace({.kind = evt::not_found, .line = 7});
+    return nil;
+  }
+
+}  // namespace se

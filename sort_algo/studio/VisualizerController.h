@@ -1,0 +1,207 @@
+#pragma once
+
+#include <QAbstractListModel>
+#include <QHash>
+#include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QVector>
+#include <QtQmlIntegration>
+
+#include <vector>
+
+#include <sa/seq/trace.hpp>
+
+// Per-bar model backing the Visualizer canvas: one row per array element, carrying
+// its current value (bar height) and its playback state (idle / comparing / swapping
+// / cursor / sorted). The controller drives it as it replays a recorded sort trace;
+// QML binds a Repeater/ListView to it so only the changed bars repaint.
+class BarModel : public QAbstractListModel {
+    Q_OBJECT
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(double maxValue READ maxValue NOTIFY maxValueChanged)
+public:
+    // Kept in sync with the QML `BarState` enum in the view.
+    enum State { Idle = 0, Comparing, Swapping, Cursor, Sorted };
+    enum Roles { ValueRole = Qt::UserRole + 1, StateRole };
+    using QAbstractListModel::QAbstractListModel;
+
+    int rowCount(const QModelIndex& parent = {}) const override {
+        return parent.isValid() ? 0 : static_cast<int>(m_values.size());
+    }
+    int count() const { return static_cast<int>(m_values.size()); }
+    double maxValue() const { return m_max; }
+
+    QVariant data(const QModelIndex& index, int role) const override {
+        const int r = index.row();
+        if (r < 0 || r >= m_values.size()) return {};
+        if (role == ValueRole) return m_values[r];
+        if (role == StateRole) return m_states[r];
+        return {};
+    }
+    QHash<int, QByteArray> roleNames() const override {
+        return { {ValueRole, "value"}, {StateRole, "barState"} };
+    }
+
+    // Replace the whole array (new size / fresh data).
+    void resetData(const QVector<double>& values) {
+        beginResetModel();
+        m_values = values;
+        m_states.assign(values.size(), Idle);
+        recomputeMax();
+        endResetModel();
+        emit countChanged();
+        emit maxValueChanged();
+    }
+    // Push updated values + states for the same-size array (one coalesced change).
+    void update(const QVector<double>& values, const QVector<int>& states) {
+        if (values.size() != m_values.size()) { resetData(values); m_states = states; }
+        else { m_values = values; m_states = states; }
+        if (m_values.isEmpty()) return;
+        emit dataChanged(index(0), index(m_values.size() - 1), {ValueRole, StateRole});
+    }
+
+signals:
+    void countChanged();
+    void maxValueChanged();
+
+private:
+    void recomputeMax() {
+        m_max = 1.0;
+        for (double v : m_values) if (v > m_max) m_max = v;
+    }
+    QVector<double> m_values;
+    QVector<int> m_states;
+    double m_max = 1.0;
+};
+
+// QML-facing controller for the Sort Visualizer. Generates an array (via sa::gen),
+// records the chosen sort's trace (a std::vector<sa::step>) by running the real
+// sa::core algorithm with a recording tracer, and replays that timeline — forward,
+// backward, seek — mapping each step to per-bar visual state. Running = replaying a
+// precomputed trace, so stepping backward is trivial (same idea as the graph
+// studio's VisualizerController).
+class VisualizerController : public QObject {
+    Q_OBJECT
+    QML_ELEMENT
+
+    Q_PROPERTY(QObject* bars READ bars CONSTANT)
+    Q_PROPERTY(QStringList algorithms READ algorithms CONSTANT)
+    Q_PROPERTY(QStringList categories READ categories CONSTANT)
+    Q_PROPERTY(QStringList distributions READ distributions CONSTANT)
+    Q_PROPERTY(QString algorithm READ algorithm WRITE setAlgorithm NOTIFY algorithmChanged)
+    Q_PROPERTY(QString distribution READ distribution WRITE setDistribution NOTIFY distributionChanged)
+    Q_PROPERTY(int size READ size NOTIFY arrayChanged)
+    Q_PROPERTY(int cursor READ cursor NOTIFY cursorChanged)
+    Q_PROPERTY(int stepCount READ stepCount NOTIFY timelineChanged)
+    Q_PROPERTY(bool atEnd READ atEnd NOTIFY cursorChanged)
+    Q_PROPERTY(int comparisons READ comparisons NOTIFY cursorChanged)
+    Q_PROPERTY(int swaps READ swaps NOTIFY cursorChanged)
+    Q_PROPERTY(int writes READ writes NOTIFY cursorChanged)
+    Q_PROPERTY(QString note READ note NOTIFY cursorChanged)
+    Q_PROPERTY(QString stepKind READ stepKind NOTIFY cursorChanged)   // current step kind, for pseudocode sync
+    Q_PROPERTY(int stepLine READ stepLine NOTIFY cursorChanged)       // current step's pseudocode line (-1 = none)
+    Q_PROPERTY(double stepValue READ stepValue NOTIFY cursorChanged)  // current operand value, 0..1 (drives sound pitch)
+    Q_PROPERTY(bool descending READ descending WRITE setDescending NOTIFY descendingChanged)
+
+public:
+    explicit VisualizerController(QObject* parent = nullptr);
+
+    QObject* bars() { return &m_bars; }
+    // Flat list (every algorithm) and the category grouping used by the pickers.
+    QStringList algorithms() const { return algorithmsIn({}); }
+    QStringList categories() const {
+        return {QStringLiteral("O(n²)"), QStringLiteral("O(n log n)"), QStringLiteral("Advanced")};
+    }
+    // Algorithms in a category; an empty/unknown category returns the full list.
+    Q_INVOKABLE QStringList algorithmsIn(const QString& category) const {
+        static const QStringList n2 = {QStringLiteral("Bubble"), QStringLiteral("Selection"),
+                                       QStringLiteral("Insertion"), QStringLiteral("Cocktail"),
+                                       QStringLiteral("Cycle")};
+        static const QStringList nlogn = {QStringLiteral("Merge"), QStringLiteral("Quick"),
+                                          QStringLiteral("Heap")};
+        static const QStringList advanced = {QStringLiteral("Shell"), QStringLiteral("Radix"),
+                                             QStringLiteral("Counting"), QStringLiteral("Bucket")};
+        if (category == QStringLiteral("O(n²)")) return n2;
+        if (category == QStringLiteral("O(n log n)")) return nlogn;
+        if (category == QStringLiteral("Advanced")) return advanced;
+        return n2 + nlogn + advanced;
+    }
+    // The category a given algorithm belongs to (for the picker's category combo).
+    Q_INVOKABLE QString categoryOf(const QString& algo) const {
+        for (const QString& c : categories())
+            if (algorithmsIn(c).contains(algo)) return c;
+        return categories().constFirst();
+    }
+    QStringList distributions() const {
+        return {QStringLiteral("Random"), QStringLiteral("Sorted"),
+                QStringLiteral("Reversed"), QStringLiteral("Nearly sorted"),
+                QStringLiteral("Few unique"), QStringLiteral("Gaussian")};
+    }
+    QString algorithm() const { return m_algorithm; }
+    void setAlgorithm(const QString& a);
+    QString distribution() const { return m_distribution; }
+    void setDistribution(const QString& d);
+
+    int size() const { return static_cast<int>(m_initial.size()); }
+    int cursor() const { return m_cursor; }
+    int stepCount() const { return static_cast<int>(m_steps.size()); }
+    bool atEnd() const { return m_cursor >= stepCount() - 1; }
+    int comparisons() const { return m_comparisons; }
+    int swaps() const { return m_swaps; }
+    int writes() const { return m_writes; }
+    QString note() const { return m_note; }
+    QString stepKind() const { return m_stepKind; }
+    int stepLine() const { return m_stepLine; }
+    double stepValue() const { return m_stepValue; }
+    bool descending() const { return m_descending; }
+    void setDescending(bool d);
+
+    // Build a fresh array of `n` elements with the current distribution + `seed`,
+    // then record the current algorithm's trace and reset playback to the start.
+    Q_INVOKABLE void generate(int n, int seed = 0);
+    // Re-shuffle at the current size with a new random seed (distribution "Random").
+    Q_INVOKABLE void shuffle();
+    // Use a user-supplied array: parse numbers from free text (any separators), set
+    // them as the array, and record. No-op if the text has no parseable number.
+    Q_INVOKABLE void setValuesFromText(const QString& text);
+    // Re-record the trace for the current array + algorithm (e.g. after changing the
+    // algorithm) and rewind to the start.
+    Q_INVOKABLE void rebuild();
+
+    Q_INVOKABLE void stepForward();
+    Q_INVOKABLE void stepBack();
+    Q_INVOKABLE void seek(int target);
+    Q_INVOKABLE void toStart() { seek(-1); }
+    Q_INVOKABLE void toEnd() { seek(stepCount() - 1); }
+
+signals:
+    void algorithmChanged();
+    void distributionChanged();
+    void arrayChanged();
+    void cursorChanged();
+    void timelineChanged();
+    void descendingChanged();
+
+private:
+    std::vector<double> buildArray(int n, quint64 seed) const;   // from m_distribution
+    void record();                                               // run algo -> m_steps
+    void rebuildValues(int target);                              // replay mutations 0..target
+    void render();                                               // push values + states + stats
+
+    BarModel m_bars;
+    QString m_algorithm = QStringLiteral("Bubble");
+    QString m_distribution = QStringLiteral("Random");
+    quint64 m_seed = 1;
+
+    std::vector<double> m_initial;    // the generated (pre-sort) array
+    std::vector<double> m_current;    // values at the current cursor
+    std::vector<sa::step> m_steps;    // recorded timeline
+    int m_cursor = -1;                // -1 = before the first step
+    int m_comparisons = 0, m_swaps = 0, m_writes = 0;
+    QString m_note;
+    QString m_stepKind;               // "compare"/"swap"/… of the current step
+    int m_stepLine = -1;              // current step's pseudocode line index
+    double m_stepValue = 0.0;         // current operand value normalised to 0..1
+    bool m_descending = false;        // sort order (comparison sorts); radix stays ascending
+};

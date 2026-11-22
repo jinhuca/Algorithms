@@ -1,0 +1,28 @@
+# Build directories
+build/
+build-*/
+out/
+
+# MSVC build artifacts (intermediate + output dirs, anywhere in the tree)
+x64/
+Win32/
+Debug/
+Release/
+*.user
+*.idb
+*.obj
+*.ifc
+*.pdb
+*.lib
+*.recipe
+.vs/
+
+# Qt Creator
+CMakeLists.txt.user
+.qtcreator/
+
+# Generated at configure time
+studio/version.h
+
+# Ad-hoc screenshots dropped in the repo root (s1.png, s2.png, …)
+/s[0-9]*.png

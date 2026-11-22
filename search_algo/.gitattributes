@@ -1,0 +1,5 @@
+# Keep binary assets byte-exact: never apply text/line-ending filters to them
+# (a CRLF-mangled .ico breaks windres and the Windows shell icon).
+*.ico binary
+*.png binary
+*.ipr binary

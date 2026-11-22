@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Modules">
+      <UniqueIdentifier>{5f1a0003-0000-4000-8000-000000000003}</UniqueIdentifier>
+      <Extensions>ixx;cppm;cpp;cxx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="bfs.ixx">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="dfs.ixx">
+      <Filter>Modules</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

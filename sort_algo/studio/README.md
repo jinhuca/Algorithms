@@ -1,0 +1,45 @@
+# studio — Sort Algorithm Studio (Qt 6 / QML app)
+
+The desktop front-end for the `sa::core` sort library. Opt-in build (needs Qt 6 and the
+shared [UiKit](../../UI_repo) module). See the top-level
+[ARCHITECTURE.md](../ARCHITECTURE.md) for the full design.
+
+## Layout
+
+- `main.cpp` — `QApplication`, splash, loads the `SortStudio` QML module.
+- `VisualizerController.{h,cpp}` — generates an array, records the chosen sort's step
+  trace, and replays it (forward/back/seek) into a per-bar `BarModel` for the canvas.
+- `AnalyzerController.{h,cpp}` — threaded benchmark sweep (timings + comparison/swap
+  counts) streamed into `AnalyzerResultsModel`; CSV export.
+- `qml/` — `Main` (shell + page router), `TitleBar`, `HomePage`, `VisualizerPage`
+  (+ `SortView` / `SortViewDots` / `SortViewStrip` / `ControlPanel` / `RunBar` /
+  `StatChip`), `AnalyzerPage` (+ `ScalingChart`), `KnowledgePage`
+  (+ `KnowledgeContent`), and the app `Theme` singleton (delegates generic tokens to
+  `UiKit.UiPalette`).
+- `sa_logo.svg` / `.png` / `.ico` — app icon (window, taskbar, and embedded `.exe`
+  icon via `appicon.rc`).
+
+## Build
+
+```sh
+cmake -S .. -B ../build-app -G Ninja -DCMAKE_PREFIX_PATH=<Qt>/mingw_64 -DSORT_ALGO_BUILD_APP=ON
+cmake --build ../build-app
+```
+
+Or open `studio/CMakeLists.txt` directly in Qt Creator — it pulls in `../core` and the
+UiKit sibling itself.
+
+## Packaging (Windows installer)
+
+`packaging/package.ps1` builds Release, deploys the Qt runtime with `windeployqt`, and
+compiles a per-user Windows installer with Inno Setup — in one step:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File packaging\package.ps1 -Trim
+```
+
+Produces `studio\build-release\sort_algorithm_studio-<version>-setup.exe` (and a stable
+`…-latest-setup.exe`). Requires Qt 6.12 (MinGW 64-bit) + Inno Setup 6; override tool
+locations via `-QtDir` / `-MingwDir` / `-Ninja` / `-Iscc`. `-Minimal` additionally drops
+the software-GL fallback and unused Controls styles for a smaller installer; `-SignToolCmd`
+code-signs the exe + installer. The installer definition is `packaging/installer.iss`.

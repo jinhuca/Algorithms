@@ -1,0 +1,40 @@
+name: core-ci
+
+# Builds the header-only sa::core and runs its CTest suite (unit + gen/bench + fuzz)
+# on Linux, Windows and macOS, and verifies the generated include/sa/*.hpp twins are
+# in sync with their .ixx module sources. The Qt app and the MSVC C++20-module build
+# (sort_algo.slnx, VS2026 toolset v145) are intentionally out of scope here — the
+# core is the portable, dependency-free part that CI can cover on stock runners.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core:
+    name: core (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check generated headers are in sync with the .ixx modules
+        run: python scripts/gen_sa_hpp.py --check
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure

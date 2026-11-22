@@ -1,0 +1,683 @@
+{
+  "directed": false,
+  "nodes": [
+    {
+      "label": "Montreal",
+      "x": -73.57,
+      "y": 45.5
+    },
+    {
+      "label": "New York",
+      "x": -74.01,
+      "y": 40.71
+    },
+    {
+      "label": "Toronto",
+      "x": -79.38,
+      "y": 43.65
+    },
+    {
+      "label": "Los Angeles",
+      "x": -118.24,
+      "y": 34.05
+    },
+    {
+      "label": "Chicago",
+      "x": -87.63,
+      "y": 41.88
+    },
+    {
+      "label": "Mexico City",
+      "x": -99.13,
+      "y": 19.43
+    },
+    {
+      "label": "Sao Paulo",
+      "x": -46.63,
+      "y": -23.55
+    },
+    {
+      "label": "Buenos Aires",
+      "x": -58.38,
+      "y": -34.6
+    },
+    {
+      "label": "Lima",
+      "x": -77.04,
+      "y": -12.05
+    },
+    {
+      "label": "Bogota",
+      "x": -74.07,
+      "y": 4.71
+    },
+    {
+      "label": "London",
+      "x": -0.13,
+      "y": 51.51
+    },
+    {
+      "label": "Paris",
+      "x": 2.35,
+      "y": 48.85
+    },
+    {
+      "label": "Madrid",
+      "x": -3.7,
+      "y": 40.42
+    },
+    {
+      "label": "Frankfurt",
+      "x": 8.68,
+      "y": 50.11
+    },
+    {
+      "label": "Rome",
+      "x": 12.5,
+      "y": 41.9
+    },
+    {
+      "label": "Amsterdam",
+      "x": 4.9,
+      "y": 52.37
+    },
+    {
+      "label": "Moscow",
+      "x": 37.62,
+      "y": 55.76
+    },
+    {
+      "label": "Istanbul",
+      "x": 28.98,
+      "y": 41.01
+    },
+    {
+      "label": "Cairo",
+      "x": 31.24,
+      "y": 30.04
+    },
+    {
+      "label": "Lagos",
+      "x": 3.38,
+      "y": 6.52
+    },
+    {
+      "label": "Johannesburg",
+      "x": 28.05,
+      "y": -26.2
+    },
+    {
+      "label": "Nairobi",
+      "x": 36.82,
+      "y": -1.29
+    },
+    {
+      "label": "Dubai",
+      "x": 55.27,
+      "y": 25.2
+    },
+    {
+      "label": "Mumbai",
+      "x": 72.88,
+      "y": 19.08
+    },
+    {
+      "label": "Delhi",
+      "x": 77.21,
+      "y": 28.61
+    },
+    {
+      "label": "Singapore",
+      "x": 103.82,
+      "y": 1.35
+    },
+    {
+      "label": "Bangkok",
+      "x": 100.5,
+      "y": 13.76
+    },
+    {
+      "label": "Hong Kong",
+      "x": 114.17,
+      "y": 22.32
+    },
+    {
+      "label": "Beijing",
+      "x": 116.41,
+      "y": 39.9
+    },
+    {
+      "label": "Shanghai",
+      "x": 121.47,
+      "y": 31.23
+    },
+    {
+      "label": "Tokyo",
+      "x": 139.69,
+      "y": 35.68
+    },
+    {
+      "label": "Seoul",
+      "x": 126.98,
+      "y": 37.57
+    },
+    {
+      "label": "Sydney",
+      "x": 151.21,
+      "y": -33.87
+    }
+  ],
+  "edges": [
+    {
+      "from": 0,
+      "to": 1,
+      "weight": 534
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "weight": 504
+    },
+    {
+      "from": 0,
+      "to": 10,
+      "weight": 5221
+    },
+    {
+      "from": 0,
+      "to": 11,
+      "weight": 5506
+    },
+    {
+      "from": 1,
+      "to": 10,
+      "weight": 5570
+    },
+    {
+      "from": 1,
+      "to": 11,
+      "weight": 5838
+    },
+    {
+      "from": 1,
+      "to": 3,
+      "weight": 3935
+    },
+    {
+      "from": 1,
+      "to": 4,
+      "weight": 1144
+    },
+    {
+      "from": 1,
+      "to": 5,
+      "weight": 3359
+    },
+    {
+      "from": 1,
+      "to": 6,
+      "weight": 7686
+    },
+    {
+      "from": 1,
+      "to": 12,
+      "weight": 5769
+    },
+    {
+      "from": 1,
+      "to": 13,
+      "weight": 6203
+    },
+    {
+      "from": 2,
+      "to": 10,
+      "weight": 5712
+    },
+    {
+      "from": 2,
+      "to": 4,
+      "weight": 701
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "weight": 3494
+    },
+    {
+      "from": 3,
+      "to": 4,
+      "weight": 2804
+    },
+    {
+      "from": 3,
+      "to": 30,
+      "weight": 8817
+    },
+    {
+      "from": 3,
+      "to": 32,
+      "weight": 12074
+    },
+    {
+      "from": 3,
+      "to": 5,
+      "weight": 2491
+    },
+    {
+      "from": 3,
+      "to": 27,
+      "weight": 11650
+    },
+    {
+      "from": 4,
+      "to": 10,
+      "weight": 6353
+    },
+    {
+      "from": 5,
+      "to": 9,
+      "weight": 3171
+    },
+    {
+      "from": 5,
+      "to": 8,
+      "weight": 4255
+    },
+    {
+      "from": 6,
+      "to": 7,
+      "weight": 1675
+    },
+    {
+      "from": 6,
+      "to": 8,
+      "weight": 3454
+    },
+    {
+      "from": 6,
+      "to": 9,
+      "weight": 4328
+    },
+    {
+      "from": 6,
+      "to": 10,
+      "weight": 9497
+    },
+    {
+      "from": 6,
+      "to": 19,
+      "weight": 6374
+    },
+    {
+      "from": 6,
+      "to": 12,
+      "weight": 8385
+    },
+    {
+      "from": 7,
+      "to": 8,
+      "weight": 3137
+    },
+    {
+      "from": 8,
+      "to": 9,
+      "weight": 1892
+    },
+    {
+      "from": 10,
+      "to": 11,
+      "weight": 344
+    },
+    {
+      "from": 10,
+      "to": 13,
+      "weight": 638
+    },
+    {
+      "from": 10,
+      "to": 12,
+      "weight": 1263
+    },
+    {
+      "from": 10,
+      "to": 14,
+      "weight": 1435
+    },
+    {
+      "from": 10,
+      "to": 15,
+      "weight": 358
+    },
+    {
+      "from": 10,
+      "to": 16,
+      "weight": 2501
+    },
+    {
+      "from": 10,
+      "to": 22,
+      "weight": 5474
+    },
+    {
+      "from": 10,
+      "to": 19,
+      "weight": 5013
+    },
+    {
+      "from": 10,
+      "to": 20,
+      "weight": 9070
+    },
+    {
+      "from": 10,
+      "to": 23,
+      "weight": 7192
+    },
+    {
+      "from": 10,
+      "to": 25,
+      "weight": 10848
+    },
+    {
+      "from": 10,
+      "to": 27,
+      "weight": 9623
+    },
+    {
+      "from": 10,
+      "to": 17,
+      "weight": 2501
+    },
+    {
+      "from": 10,
+      "to": 18,
+      "weight": 3512
+    },
+    {
+      "from": 11,
+      "to": 13,
+      "weight": 478
+    },
+    {
+      "from": 11,
+      "to": 14,
+      "weight": 1105
+    },
+    {
+      "from": 11,
+      "to": 12,
+      "weight": 1052
+    },
+    {
+      "from": 11,
+      "to": 22,
+      "weight": 5247
+    },
+    {
+      "from": 11,
+      "to": 30,
+      "weight": 9714
+    },
+    {
+      "from": 13,
+      "to": 16,
+      "weight": 2021
+    },
+    {
+      "from": 13,
+      "to": 17,
+      "weight": 1867
+    },
+    {
+      "from": 13,
+      "to": 22,
+      "weight": 4836
+    },
+    {
+      "from": 13,
+      "to": 25,
+      "weight": 10258
+    },
+    {
+      "from": 13,
+      "to": 28,
+      "weight": 7781
+    },
+    {
+      "from": 15,
+      "to": 14,
+      "weight": 1297
+    },
+    {
+      "from": 15,
+      "to": 22,
+      "weight": 5160
+    },
+    {
+      "from": 14,
+      "to": 18,
+      "weight": 2133
+    },
+    {
+      "from": 14,
+      "to": 17,
+      "weight": 1375
+    },
+    {
+      "from": 16,
+      "to": 28,
+      "weight": 5794
+    },
+    {
+      "from": 16,
+      "to": 17,
+      "weight": 1757
+    },
+    {
+      "from": 16,
+      "to": 24,
+      "weight": 4343
+    },
+    {
+      "from": 17,
+      "to": 18,
+      "weight": 1237
+    },
+    {
+      "from": 17,
+      "to": 22,
+      "weight": 2995
+    },
+    {
+      "from": 18,
+      "to": 21,
+      "weight": 3534
+    },
+    {
+      "from": 18,
+      "to": 22,
+      "weight": 2423
+    },
+    {
+      "from": 18,
+      "to": 19,
+      "weight": 3913
+    },
+    {
+      "from": 19,
+      "to": 20,
+      "weight": 4508
+    },
+    {
+      "from": 19,
+      "to": 21,
+      "weight": 3812
+    },
+    {
+      "from": 20,
+      "to": 21,
+      "weight": 2924
+    },
+    {
+      "from": 20,
+      "to": 22,
+      "weight": 6419
+    },
+    {
+      "from": 20,
+      "to": 32,
+      "weight": 11041
+    },
+    {
+      "from": 21,
+      "to": 22,
+      "weight": 3553
+    },
+    {
+      "from": 22,
+      "to": 23,
+      "weight": 1935
+    },
+    {
+      "from": 22,
+      "to": 24,
+      "weight": 2205
+    },
+    {
+      "from": 22,
+      "to": 25,
+      "weight": 5837
+    },
+    {
+      "from": 22,
+      "to": 26,
+      "weight": 4884
+    },
+    {
+      "from": 22,
+      "to": 27,
+      "weight": 5955
+    },
+    {
+      "from": 22,
+      "to": 32,
+      "weight": 12049
+    },
+    {
+      "from": 23,
+      "to": 24,
+      "weight": 1147
+    },
+    {
+      "from": 23,
+      "to": 25,
+      "weight": 3904
+    },
+    {
+      "from": 24,
+      "to": 26,
+      "weight": 2915
+    },
+    {
+      "from": 24,
+      "to": 27,
+      "weight": 3761
+    },
+    {
+      "from": 25,
+      "to": 26,
+      "weight": 1427
+    },
+    {
+      "from": 25,
+      "to": 27,
+      "weight": 2586
+    },
+    {
+      "from": 25,
+      "to": 32,
+      "weight": 6306
+    },
+    {
+      "from": 25,
+      "to": 30,
+      "weight": 5314
+    },
+    {
+      "from": 26,
+      "to": 27,
+      "weight": 1729
+    },
+    {
+      "from": 26,
+      "to": 28,
+      "weight": 3295
+    },
+    {
+      "from": 27,
+      "to": 28,
+      "weight": 1966
+    },
+    {
+      "from": 27,
+      "to": 29,
+      "weight": 1227
+    },
+    {
+      "from": 27,
+      "to": 30,
+      "weight": 2879
+    },
+    {
+      "from": 27,
+      "to": 32,
+      "weight": 7376
+    },
+    {
+      "from": 28,
+      "to": 29,
+      "weight": 1067
+    },
+    {
+      "from": 28,
+      "to": 31,
+      "weight": 952
+    },
+    {
+      "from": 28,
+      "to": 30,
+      "weight": 2092
+    },
+    {
+      "from": 29,
+      "to": 30,
+      "weight": 1758
+    },
+    {
+      "from": 29,
+      "to": 31,
+      "weight": 867
+    },
+    {
+      "from": 30,
+      "to": 31,
+      "weight": 1153
+    },
+    {
+      "from": 30,
+      "to": 32,
+      "weight": 7826
+    }
+  ],
+  "view": {
+    "use3D": true,
+    "v3d": {
+      "style": {
+        "globeMode": true
+      },
+      "showGrid": false,
+      "showLabels": true,
+      "showLegend": true
+    }
+  }
+}
