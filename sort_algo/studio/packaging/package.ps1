@@ -4,19 +4,64 @@
 #
 # Produces build-release\sort_algorithm_studio-<version>-setup.exe (and a stable
 # build-release\sort_algorithm_studio-latest-setup.exe copy).
-# Requires: Qt 6.12.0 (MinGW 64-bit) + Inno Setup 6. Override paths via
-# -QtDir / -MingwDir / -Ninja / -Iscc if your install locations differ.
+# Requires: Qt 6.12.0 (MinGW 64-bit) + Inno Setup 6. If Qt lives elsewhere, pass
+# -QtRoot (e.g. C:\Qt16) / -QtVer, or individually -QtDir / -MingwDir / -Ninja / -Iscc.
 
 param(
-    [string]$QtDir    = "C:\Qt\6.12.0\mingw_64",
-    [string]$MingwDir = "C:\Qt\Tools\mingw1310_64",
-    [string]$Ninja    = "C:\Qt\Tools\Ninja\ninja.exe",
+    [string]$QtRoot   = "C:\Qt",        # Qt install root (holds <QtVer>\ and Tools\)
+    [string]$QtVer    = "6.12.0",       # Qt version subfolder under the root
+    [string]$QtDir    = "",             # default: <QtRoot>\<QtVer>\mingw_64
+    [string]$MingwDir = "",             # default: <QtRoot>\Tools\mingw1310_64 (newest mingw*_64 if absent)
+    [string]$Ninja    = "",             # default: <QtRoot>\Tools\Ninja\ninja.exe
     [string]$Iscc     = "",             # auto-detected below if empty
     [switch]$Trim,                      # drop clearly-unused files (translations, virtual keyboard)
     [switch]$Minimal,                   # also drop the software-GL fallback + unused Controls styles
     [string]$SignToolCmd = ""           # if set, code-sign the exe + installer (see README)
 )
 $ErrorActionPreference = "Stop"
+
+# Resolve the Qt kit. Prefer the requested <QtVer>, but if it isn't installed on
+# this machine (e.g. only a different Qt version is present, or Qt lives under C:\Qt16), fall back
+# to the newest mingw_64 kit found under a known Qt root — so one script builds
+# across machines.
+$QtRoots = @($QtRoot, "C:\Qt", "C:\Qt16", "D:\Qt", "D:\Qt16") |
+    Where-Object { Test-Path $_ } | Select-Object -Unique
+if (-not $QtDir) {
+    $hit = $QtRoots | Where-Object { Test-Path (Join-Path $_ "$QtVer\mingw_64") } | Select-Object -First 1
+    if ($hit) {
+        $QtRoot = $hit
+    } else {
+        $kits = foreach ($r in $QtRoots) {
+            Get-ChildItem $r -Directory -ErrorAction SilentlyContinue |
+                Where-Object { Test-Path (Join-Path $_.FullName "mingw_64") } |
+                ForEach-Object {
+                    $v = $null
+                    if ([version]::TryParse($_.Name, [ref]$v)) {
+                        [pscustomobject]@{ Root = $r; Ver = $_.Name; V = $v }
+                    }
+                }
+        }
+        $best = $kits | Sort-Object V -Descending | Select-Object -First 1
+        if ($best) {
+            Write-Host "    Qt $QtVer not found; using $($best.Ver) under $($best.Root)"
+            $QtRoot = $best.Root; $QtVer = $best.Ver
+        }
+    }
+    $QtDir = Join-Path $QtRoot "$QtVer\mingw_64"
+}
+# Derive the compiler / ninja paths from the chosen root unless passed explicitly.
+if (-not $MingwDir) {
+    $MingwDir = Join-Path $QtRoot "Tools\mingw1310_64"
+    if (-not (Test-Path $MingwDir)) {
+        $m = Get-ChildItem (Join-Path $QtRoot "Tools") -Directory -Filter "mingw*_64" -ErrorAction SilentlyContinue |
+             Sort-Object Name -Descending | Select-Object -First 1
+        if ($m) { $MingwDir = $m.FullName }
+    }
+}
+if (-not $Ninja)    { $Ninja = Join-Path $QtRoot "Tools\Ninja\ninja.exe" }
+if (-not (Test-Path $QtDir)) {
+    throw "No Qt mingw_64 kit found (looked for '$QtVer' and any version under C:\Qt, C:\Qt16, D:\Qt, D:\Qt16). Pass -QtDir, or -QtRoot/-QtVer."
+}
 
 # CMake stores these verbatim in its generated *.cmake files, where backslashes are
 # string escapes (e.g. "\Q" is invalid) — so hand CMake forward slashes.
@@ -25,11 +70,14 @@ $MingwDirFwd = $MingwDir -replace '\\', '/'
 $NinjaFwd    = $Ninja    -replace '\\', '/'
 
 if (-not $Iscc) {
-    $Iscc = @(
-        "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
-        "${env:ProgramFiles}\Inno Setup 6\ISCC.exe",
-        "${env:LOCALAPPDATA}\Programs\Inno Setup 6\ISCC.exe"
-    ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+    # Find ISCC.exe under any "Inno Setup <n>" folder (newest major first), so a
+    # v6 or v7 install is picked up without -Iscc.
+    $Iscc = @("${env:ProgramFiles(x86)}", "${env:ProgramFiles}", "${env:LOCALAPPDATA}\Programs") |
+        Where-Object { $_ -and (Test-Path $_) } |
+        ForEach-Object { Get-ChildItem -LiteralPath $_ -Directory -Filter "Inno Setup *" -ErrorAction SilentlyContinue } |
+        Sort-Object { $n = $_.Name -replace '\D'; if ($n) { [int]$n } else { 0 } } -Descending |
+        ForEach-Object { Join-Path $_.FullName "ISCC.exe" } |
+        Where-Object { Test-Path $_ } | Select-Object -First 1
 }
 $pkg  = $PSScriptRoot
 $root = Split-Path -Parent $pkg          # studio\
