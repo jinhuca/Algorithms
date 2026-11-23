@@ -18,6 +18,12 @@ se....;` declaration, turn `import se....;` into the matching `#include "...hpp"
 strip a leading `export ` (so `export namespace se` -> `namespace se`), and prepend
 the generated-header banner.
 
+`import std;` has no header form (the header twin targets toolchains without a std
+module). This script expands it to the curated STD_INCLUDES set below, so a module can
+just write `import std;` for MSVC and the header still compiles under MinGW/Qt. To pin
+a minimal, exact include set for one module instead, list `//#include <...>` hints next
+to `import std;` -- those win over the curated set.
+
 Usage:
   py -I scripts/gen_se_hpp.py           # (re)generate every core/include/se/*.hpp
   py -I scripts/gen_se_hpp.py --check   # exit 1 if any .hpp is stale (CI / build)
@@ -54,6 +60,22 @@ _EXPORT_PREFIX = re.compile(r"^(\s*)export\s+")
 _MODULE_DECL = re.compile(r"^\s*export\s+module\s+([\w.]+)\s*;\s*$")
 # `import se.seq;` or `export import se.seq;` (an intra-project se.* module).
 _IMPORT = re.compile(r"^\s*(?:export\s+)?import\s+([\w.]+)\s*;\s*$")
+# `import std;` -- the whole standard library; no header form (see module docstring).
+_IMPORT_STD = re.compile(r"^\s*import\s+std\s*;\s*$")
+# A commented-out system include, e.g. `//#include <ranges>` -- the header-twin form
+# of (part of) `import std;`. Captures the live `#include <...>` directive.
+_COMMENTED_SYS_INCLUDE = re.compile(r"^\s*//\s*(#include\s*<[^>]+>)\s*$")
+
+# `import std;` names the whole standard library, which a header can't; when a module
+# uses `import std;` without explicit `//#include` hints, the twin gets this curated
+# superset of the standard headers the cores use. Add to this list if a core starts
+# using a facility whose header isn't here (the MinGW/Qt build names the missing one).
+STD_INCLUDES = [
+    "<algorithm>", "<bit>", "<chrono>", "<cmath>", "<compare>", "<concepts>",
+    "<cstddef>", "<cstdint>", "<functional>", "<limits>", "<map>", "<numeric>",
+    "<queue>", "<random>", "<ranges>", "<string>", "<tuple>", "<type_traits>",
+    "<unordered_set>", "<utility>", "<vector>",
+]
 
 
 def ixx_files():
@@ -83,13 +105,29 @@ def module_headers():
 def transform(ixx: pathlib.Path, names: dict) -> str:
     """Turn one module source into the equivalent header text (LF line endings)."""
     cur_dir = hpp_for(ixx).parent
+    lines = ixx.read_text(encoding="utf-8").splitlines()
+    uses_import_std = any(_IMPORT_STD.match(l) for l in lines)
+    # Explicit `//#include <...>` hints give an exact, minimal include set and win;
+    # with none, `import std;` expands to the curated STD_INCLUDES set.
+    has_hints = any(_COMMENTED_SYS_INCLUDE.match(l) for l in lines)
+    expand_std = uses_import_std and not has_hints
     body = []
-    for line in ixx.read_text(encoding="utf-8").splitlines():
+    for line in lines:
         stripped = line.strip()
         if stripped == "module;":
             continue                                  # global-module-fragment marker
         if _MODULE_DECL.match(line):
             continue                                  # module declaration: no header form
+        if _IMPORT_STD.match(line):
+            if expand_std:
+                body.extend(f"#include {h}" for h in STD_INCLUDES)
+                expand_std = False                    # inject the curated set once
+            continue                                  # `import std;` -> #includes (hints or set)
+        if uses_import_std:
+            mc = _COMMENTED_SYS_INCLUDE.match(line)
+            if mc:
+                body.append(mc.group(1))              # `//#include <ranges>` -> `#include <ranges>`
+                continue
         mo = _IMPORT.match(line)
         if mo and mo.group(1) in names:
             target = SE / names[mo.group(1)]          # sibling se.* module -> its header

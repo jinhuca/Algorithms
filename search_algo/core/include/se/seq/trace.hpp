@@ -26,14 +26,30 @@
 // a double `value` used only to show the probed element's height. So a single tracer
 // type serves every search.
 
+#include <algorithm>
+#include <bit>
+#include <chrono>
+#include <cmath>
+#include <compare>
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <limits>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <random>
+#include <ranges>
 #include <string>
+#include <tuple>
 #include <type_traits>
-
+#include <unordered_set>
+#include <utility>
+#include <vector>
 #include "seq.hpp"
 
 namespace se {
-
   enum class evt {
     probe,          // examining a[i] — comparing a[i] against the target
     lo_bound,       // the search window's lower bound moved to i (sorted searches)
@@ -63,10 +79,9 @@ namespace se {
   // Project an element to the double carried by a step (a bar height for the
   // visualizer). Numeric elements map to their value; any other T contributes 0 —
   // the trace positions still drive the animation either way.
-  template <class T>
+  template <typename T>
   inline double value_of(const T& x) {
-    if constexpr (std::is_arithmetic_v<T>) return static_cast<double>(x);
+    if constexpr(std::is_arithmetic_v<T>) return static_cast<double>(x);
     else return 0.0;
   }
-
 }  // namespace se

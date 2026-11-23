@@ -71,6 +71,37 @@ ApplicationWindow {
 
     function toggleMaximize() { if (_maxed) { showNormal(); _maxed = false; } else { showMaximized(); _maxed = true; } }
 
+    // If the restored window geometry (winX/winY, persisted above) lands off every
+    // currently-connected monitor — common after unplugging/replugging monitors or
+    // moving the install to a machine with a different display layout — the frameless
+    // window becomes unreachable: it's running (in the taskbar) but visible on no
+    // screen, and there's no title bar to drag it back. Pull it back onto a real
+    // screen. Runs at startup, after Settings has restored the saved geometry.
+    function ensureOnScreen() {
+        var screens = Application.screens;
+        if (!screens || screens.length === 0)
+            return;
+        var need = 120;                       // px of the window that must stay visible
+        var wr = win.x + win.width, wb = win.y + win.height;
+        for (var i = 0; i < screens.length; i++) {
+            var s = screens[i];
+            var ix = Math.max(win.x, s.virtualX);
+            var iy = Math.max(win.y, s.virtualY);
+            var ixr = Math.min(wr, s.virtualX + s.width);
+            var iyb = Math.min(wb, s.virtualY + s.height);
+            if (ixr - ix >= need && iyb - iy >= need)
+                return;                       // enough of it shows on this screen — keep it
+        }
+        // Off every screen: clamp the size to the primary screen and recentre there.
+        var p = screens[0];
+        win.width = Math.min(win.width, p.width - 80);
+        win.height = Math.min(win.height, p.height - 80);
+        win.x = p.virtualX + Math.round((p.width - win.width) / 2);
+        win.y = p.virtualY + Math.round((p.height - win.height) / 2);
+    }
+
+    Component.onCompleted: ensureOnScreen()   // rescue an off-screen restored position
+
     header: TitleBar {
         title: win.page === "analyzer" ? "Search Algorithm Analyzer"
              : win.page === "visualizer" ? "Search Algorithm Visualizer"

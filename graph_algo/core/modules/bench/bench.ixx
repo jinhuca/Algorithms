@@ -9,14 +9,8 @@ module;
 // IMPORTANT: a timed run must call the algorithm WITHOUT a tracer (the default
 // ga::ignore) — recording steps would dominate the measurement. The counting
 // tracer here is for a SEPARATE, untimed run only.
-
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <cstddef>
-#include <vector>
-
 export module ga.bench;
+import std;
 
 import ga.trace;
 
@@ -25,7 +19,7 @@ namespace bench {
 
   // Keep `value` observably "used" so the optimizer can't delete the work that
   // produced it (Google-Benchmark's trick). Call it on each iteration's result.
-  template <class T>
+  template <typename T>
   inline void do_not_optimize(const T& value) {
 #if defined(__clang__) || defined(__GNUC__)
     asm volatile("" : : "m"(value) : "memory");
@@ -44,7 +38,7 @@ namespace bench {
   };
 
   // Time `fn` over `runs` timed iterations after `warmup` untimed ones.
-  template <class Fn>
+  template <typename Fn>
   result time_it(Fn&& fn, int runs = 5, int warmup = 1) {
     for (int i = 0; i < warmup; ++i) fn();
     std::vector<double> ms;

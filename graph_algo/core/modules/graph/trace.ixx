@@ -10,16 +10,12 @@ module;
 //
 // `step` is intentionally weight-agnostic (it carries plain vertex ids and a
 // double `value`) so a single tracer type works for every algorithm.
-
-#include <functional>
-#include <string>
-
 export module ga.trace;
 
+import std;
 import ga.graph;
 
 export namespace ga {
-
   enum class evt {
     discover_vertex,   // vertex first reached / enqueued (becomes "frontier")
     visit_vertex,      // vertex taken off the frontier / now "current"
@@ -44,5 +40,4 @@ export namespace ga {
 
   // Default no-op tracer, so algorithms can call the tracer unconditionally.
   inline void ignore(const step&) {}
-
 }  // namespace ga

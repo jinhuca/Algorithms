@@ -31,7 +31,7 @@ endif()
 # AppVersion). Build is an auto number = the git commit count, zero-padded to 4
 # digits, (re)computed at CMake configure time. version.h.in -> version.h feeds
 # main.cpp, which publishes it as Qt.application.version for the title bar.
-set(GA_VERSION "1.3.2")
+set(GA_VERSION "1.4.2")
 set(GA_BUILD "0")
 find_package(Git QUIET)
 if (Git_FOUND)

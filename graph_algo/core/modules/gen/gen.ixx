@@ -8,15 +8,8 @@ module;
 //
 // Weights: pass wmin == wmax (the default, 1) for an unweighted graph, or a
 // range [wmin, wmax] for uniform random weights (for Dijkstra / MST workloads).
-
-#include <cstddef>
-#include <cstdint>
-#include <random>
-#include <unordered_set>
-#include <utility>
-#include <vector>
-
 export module ga.gen;
+import std;
 
 import ga.graph;
 
@@ -33,7 +26,7 @@ namespace gen {
 
   // One edge weight: the constant wmin when wmax <= wmin, else uniform in
   // [wmin, wmax] (sampled as double, cast back to W).
-  template <class W>
+  template <typename W>
   inline W sample_weight(rng_t& r, W wmin, W wmax) {
     if (!(wmax > wmin)) return wmin;
     std::uniform_real_distribution<double> d(static_cast<double>(wmin),
@@ -43,7 +36,7 @@ namespace gen {
 
   // Complete graph K_n: every distinct pair connected once (undirected) or in
   // both directions (directed). Dense — Θ(n²) edges; the stress case.
-  template <class W = double>
+  template <typename W = double>
   graph<W> complete(std::size_t n, bool directed = false,
                     W wmin = W{1}, W wmax = W{1}, std::uint64_t seed = 0) {
     graph<W> g(n, directed);
@@ -56,7 +49,7 @@ namespace gen {
 
   // 4-neighbour grid lattice, rows × cols, undirected. Vertex (r, c) has id
   // r*cols + c. Predictable structure and diameter — clean for scaling curves.
-  template <class W = double>
+  template <typename W = double>
   graph<W> grid(std::size_t rows, std::size_t cols,
                 W wmin = W{1}, W wmax = W{1}, std::uint64_t seed = 0) {
     graph<W> g(rows * cols, false);
@@ -73,7 +66,7 @@ namespace gen {
   // Erdős–Rényi G(n, m): n vertices and m distinct random edges (no self-loops,
   // no parallels). Rejection sampling — intended for sparse m (m ≪ n²); m is
   // clamped to the maximum possible edge count.
-  template <class W = double>
+  template <typename W = double>
   graph<W> random_gnm(std::size_t n, std::size_t m, bool directed = false,
                       std::uint64_t seed = 0, W wmin = W{1}, W wmax = W{1}) {
     graph<W> g(n, directed);
@@ -99,7 +92,7 @@ namespace gen {
   // Barabási–Albert scale-free: start from a clique of m seed vertices, then each
   // new vertex attaches to m existing vertices chosen with probability ∝ degree
   // (preferential attachment). Yields a few high-degree hubs, like real networks.
-  template <class W = double>
+  template <typename W = double>
   graph<W> scale_free(std::size_t n, std::size_t m, std::uint64_t seed = 0,
                       W wmin = W{1}, W wmax = W{1}) {
     if (m < 1) m = 1;

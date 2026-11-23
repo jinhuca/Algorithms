@@ -10,59 +10,58 @@ module;
 // not in-place, and does ZERO comparisons — a useful contrast in the Analyzer. Emits
 // `read` while keying and `overwrite` as each distribution pass rewrites the array.
 
-#include <bit>
-#include <cstdint>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
 export module sa.advanced_sorts.radix;
 
+import std;
 import sa.seq;
 import sa.trace;
 
 export namespace sa {
-
   // Map an element to a 64-bit key whose unsigned order matches the value's natural
   // order — for unsigned, signed (flip sign bit) and floating (IEEE bit transform).
-  template <class T>
+  template <typename T>
   inline std::uint64_t radix_key(const T& x) {
-    if constexpr (std::is_integral_v<T>) {
-      if constexpr (std::is_signed_v<T>)
+    if constexpr(std::is_integral_v<T>) {
+      if constexpr(std::is_signed_v<T>)
         return static_cast<std::uint64_t>(static_cast<std::int64_t>(x)) ^ 0x8000000000000000ULL;
       else
         return static_cast<std::uint64_t>(x);
-    } else {
+    }
+    else {
       const std::uint64_t b = std::bit_cast<std::uint64_t>(static_cast<double>(x));
       const std::uint64_t mask = (b >> 63) ? ~0ULL : 0x8000000000000000ULL;
       return b ^ mask;   // negatives -> below positives, order preserved
     }
   }
 
-  template <class T>
-  void radix_sort(std::vector<T>& a, const tracer& trace = ignore) {
-    static_assert(std::is_arithmetic_v<T>, "radix_sort requires an arithmetic key type");
-    const std::size_t n = a.size();
-    if (n < 2) { if (n == 1) trace({.kind = evt::mark_sorted, .i = 0, .line = 1}); return; }
+  template <arithmetically_sortable R>
+  void radix_sort(R& data, const tracer& trace = ignore) {
+    using T = std::ranges::range_value_t<R>;
+    const std::size_t n = std::ranges::size(data);
+    auto out = std::ranges::begin(data);
+    if(n < 2) { if(n == 1) trace({.kind = evt::mark_sorted, .i = 0, .line = 1}); return; }
+
+    std::vector<T> a(n);                       // radix is not in-place: sort a working copy,
+    for(std::size_t i = 0; i < n; ++i) a[i] = out[i];    // then write the result back below
 
     std::vector<std::uint64_t> keys(n);
-    for (std::size_t i = 0; i < n; ++i) {
+    for(std::size_t i = 0; i < n; ++i) {
       keys[i] = radix_key(a[i]);
       trace({.kind = evt::read, .i = i, .value = value_of(a[i]), .line = 0});
     }
 
     std::vector<T> outA(n);
     std::vector<std::uint64_t> outK(n);
-    for (int shift = 0; shift < 64; shift += 8) {
+    for(int shift = 0; shift < 64; shift += 8) {
       std::size_t count[256] = {0};
-      for (std::size_t i = 0; i < n; ++i) ++count[(keys[i] >> shift) & 0xFF];
-      if (count[(keys[0] >> shift) & 0xFF] == n) continue;   // all share this byte -> no-op pass
+      for(std::size_t i = 0; i < n; ++i) ++count[(keys[i] >> shift) & 0xFF];
+      if(count[(keys[0] >> shift) & 0xFF] == n) continue;   // all share this byte -> no-op pass
 
       std::size_t offset[256];
       std::size_t sum = 0;
-      for (int b = 0; b < 256; ++b) { offset[b] = sum; sum += count[b]; }
+      for(int b = 0; b < 256; ++b) { offset[b] = sum; sum += count[b]; }
 
-      for (std::size_t i = 0; i < n; ++i) {
+      for(std::size_t i = 0; i < n; ++i) {
         const std::size_t b = (keys[i] >> shift) & 0xFF;
         const std::size_t pos = offset[b]++;
         outA[pos] = a[i];
@@ -70,11 +69,11 @@ export namespace sa {
       }
       std::swap(a, outA);
       std::swap(keys, outK);
-      for (std::size_t i = 0; i < n; ++i)
+      for(std::size_t i = 0; i < n; ++i)
         trace({.kind = evt::overwrite, .i = i, .value = value_of(a[i]), .line = 4});
       trace({.kind = evt::pass_boundary, .value = static_cast<double>(shift / 8), .note = "digit pass", .line = 1});
     }
+    for(std::size_t i = 0; i < n; ++i) out[i] = a[i];    // copy the sorted working copy back into the range
     trace({.kind = evt::mark_sorted, .i = 0, .line = 1});
   }
-
 }  // namespace sa

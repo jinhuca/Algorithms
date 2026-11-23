@@ -24,13 +24,30 @@
 // `step` is intentionally weight-agnostic (it carries plain vertex ids and a
 // double `value`) so a single tracer type works for every algorithm.
 
+#include <algorithm>
+#include <bit>
+#include <chrono>
+#include <cmath>
+#include <compare>
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <limits>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <random>
+#include <ranges>
 #include <string>
-
+#include <tuple>
+#include <type_traits>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 #include "graph.hpp"
 
 namespace ga {
-
   enum class evt {
     discover_vertex,   // vertex first reached / enqueued (becomes "frontier")
     visit_vertex,      // vertex taken off the frontier / now "current"
@@ -55,5 +72,4 @@ namespace ga {
 
   // Default no-op tracer, so algorithms can call the tracer unconditionally.
   inline void ignore(const step&) {}
-
 }  // namespace ga

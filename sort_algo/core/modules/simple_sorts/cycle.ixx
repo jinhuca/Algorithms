@@ -9,52 +9,50 @@ module;
 // and an `overwrite` for every (minimal) placement — so the visualizer shows items
 // hopping straight to their home.
 
-#include <utility>
-#include <vector>
-
 export module sa.simple_sorts.cycle;
 
+import std;
 import sa.seq;
 import sa.trace;
 
 export namespace sa {
-
-  template <class T, class Compare = less>
-  void cycle_sort(std::vector<T>& a, Compare cmp = {}, const tracer& trace = ignore) {
-    const std::size_t n = a.size();
+  template <sortable R, typename Compare = less>
+  void cycle_sort(R& data, Compare cmp = {}, const tracer& trace = ignore) {
+    using T = std::ranges::range_value_t<R>;
+    auto a = std::ranges::begin(data);           // mutable random-access iterator: a[i] is element i
+    const std::size_t n = std::ranges::size(data);
     // Equivalence under a strict-weak-ordering comparator (for skipping duplicates),
     // so the algorithm stays correct for an arbitrary Compare, not just operator<.
     auto equiv = [&](const T& x, const T& y) { return !cmp(x, y) && !cmp(y, x); };
 
-    for (std::size_t start = 0; start + 1 < n; ++start) {
+    for(std::size_t start = 0; start + 1 < n; ++start) {
       T item = a[start];
       trace({.kind = evt::cursor, .i = start, .value = value_of(item), .line = 1});
 
       // Where does `item` belong? Count the elements after `start` that are smaller.
       std::size_t pos = start;
-      for (std::size_t i = start + 1; i < n; ++i) {
+      for(std::size_t i = start + 1; i < n; ++i) {
         trace({.kind = evt::compare, .i = i, .j = start, .line = 2});
-        if (cmp(a[i], item)) ++pos;
+        if(cmp(a[i], item)) ++pos;
       }
-      if (pos == start) continue;                 // already in place -> no cycle
+      if(pos == start) continue;                 // already in place -> no cycle
 
-      while (equiv(item, a[pos])) ++pos;          // place after any equal elements
+      while(equiv(item, a[pos])) ++pos;          // place after any equal elements
       std::swap(item, a[pos]);
       trace({.kind = evt::overwrite, .i = pos, .value = value_of(a[pos]), .line = 4});
 
       // Rotate the rest of the cycle until the displaced item returns to `start`.
-      while (pos != start) {
+      while(pos != start) {
         pos = start;
-        for (std::size_t i = start + 1; i < n; ++i) {
+        for(std::size_t i = start + 1; i < n; ++i) {
           trace({.kind = evt::compare, .i = i, .j = start, .line = 2});
-          if (cmp(a[i], item)) ++pos;
+          if(cmp(a[i], item)) ++pos;
         }
-        while (equiv(item, a[pos])) ++pos;
+        while(equiv(item, a[pos])) ++pos;
         std::swap(item, a[pos]);
         trace({.kind = evt::overwrite, .i = pos, .value = value_of(a[pos]), .line = 5});
       }
     }
-    if (n > 0) trace({.kind = evt::mark_sorted, .i = 0, .line = 0});
+    if(n > 0) trace({.kind = evt::mark_sorted, .i = 0, .line = 0});
   }
-
 }  // namespace sa

@@ -130,8 +130,9 @@ int main() {
         CHECK(words[binary_search(words, std::string("pear"))] == "pear");
     }
 
-    // --- the searchable concept accepts a vector, orderable accepts int/string ---
-    static_assert(se::searchable<std::vector<int>>);
+    // --- concept checks: a vector is both searchable and sorted_searchable;
+    //     orderable accepts int/string (the default-comparator element case) ---
+    static_assert(se::searchable<std::vector<int>> && se::sorted_searchable<std::vector<int>>);
     static_assert(se::orderable<int> && se::orderable<std::string>);
 
     if (failures == 0) std::printf("OK: all search core checks passed\n");

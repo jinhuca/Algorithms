@@ -27,7 +27,7 @@ if (NOT TARGET UiKit)
 endif()
 
 # ---- application version: Major.Minor.Patch.Build --------------------------
-set(SE_VERSION "1.0.0")
+set(SE_VERSION "1.1.0")
 set(SE_BUILD "0")
 find_package(Git QUIET)
 if (Git_FOUND)

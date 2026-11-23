@@ -25,8 +25,26 @@
 // explicit stack grows on the heap instead. Each frame remembers how far u's
 // out-edges have been scanned, so descending into a child and later resuming the
 // parent reproduces the recursive trace order exactly.
-
+#include <algorithm>
+#include <bit>
+#include <chrono>
+#include <cmath>
+#include <compare>
+#include <concepts>
 #include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <limits>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <random>
+#include <ranges>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include "../graph/graph.hpp"
@@ -34,8 +52,8 @@
 
 namespace ga {
 
-  template <class W>
-  std::vector<vertex> dfs(const graph<W>& g, vertex src, const tracer& trace = ignore) {
+  template <graph_like G>
+  std::vector<vertex> dfs(const G& g, vertex src, const tracer& trace = ignore) {
     std::vector<vertex> parent(g.order(), nil);
     std::vector<char> seen(g.order(), 0);   // 0 = unseen, 1 = on stack, 2 = finished
 
@@ -56,7 +74,7 @@ namespace ga {
       const vertex u = stack.back().u;
       const auto& edges = g.out(u);
       if(stack.back().i < edges.size()) {
-        const edge<W>& e = edges[stack.back().i];
+        const auto& e = edges[stack.back().i];
         ++stack.back().i;                   // advance BEFORE enter() (it may realloc `stack`)
         trace({evt::examine_edge, u, e.to});
         if(seen[e.to] == 0) {

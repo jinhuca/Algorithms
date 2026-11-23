@@ -8,22 +8,18 @@ module;
 // steps (discover / visit / finish vertex, and tree_edge for the connecting
 // edge) so a visualizer can animate the tree growing. Returns the total weight;
 // on a disconnected graph it spans only the start vertex's component.
-
-#include <queue>
-#include <tuple>
-#include <vector>
-
 export module ga.mst.prim;
 
+import std;
 import ga.graph;
 import ga.trace;
 
 export namespace ga {
-
-  template <class W>
-  W prim(const graph<W>& g, vertex src, const tracer& trace = ignore) {
+  template <graph_like G>
+  weight_t<G> prim(const G& g, vertex src, const tracer& trace = ignore) {
+    using W = weight_t<G>;
     const std::size_t n = g.order();
-    if (n == 0 || src >= n) return W{};
+    if(n == 0 || src >= n) return W{};
 
     std::vector<char> inTree(n, 0);
     // (weight, to, from) — min-heap by weight; `from` is nil for the seed.
@@ -34,22 +30,23 @@ export namespace ga {
     trace({evt::discover_vertex, src});
 
     W total{};
-    while (!pq.empty()) {
+    while(!pq.empty()) {
       const auto [w, u, from] = pq.top();
       pq.pop();
-      if (inTree[u]) continue;                 // stale heap entry
+      if(inTree[u]) continue;                 // stale heap entry
       inTree[u] = 1;
       trace({evt::visit_vertex, u});
-      if (from != nil) {
+      if(from != nil) {
         total += w;
         trace({evt::tree_edge, from, u, static_cast<double>(w)});
       }
-      for (const auto& e : g.out(u)) {
+      for(const auto& e : g.out(u)) {
         trace({evt::examine_edge, u, e.to});
-        if (!inTree[e.to]) {
+        if(!inTree[e.to]) {
           pq.push({e.weight, e.to, u});
           trace({evt::discover_vertex, e.to});
-        } else {
+        }
+        else {
           trace({evt::skip_edge, u, e.to});
         }
       }
@@ -57,5 +54,4 @@ export namespace ga {
     }
     return total;
   }
-
 }  // namespace ga

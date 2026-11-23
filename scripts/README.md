@@ -1,8 +1,7 @@
 # scripts — build cleanup
 
 Scripts for removing all CMake / Qt / MSVC **build output** under `Algorithms`
-(the parent repo **and** every submodule: `graph_algo`, `search_algo`,
-`sort_algo`, `UI_repo`).
+(the whole monorepo: `graph_algo`, `search_algo`, `sort_algo`, `UI_repo`).
 
 Two equivalent versions are provided — use whichever matches your shell:
 
@@ -19,7 +18,7 @@ Both do exactly the same thing, never touch source files, and support a
 ## What gets deleted
 
 - **Directories** named: `build`, `build-*`, `out`, `cmake-build-*`,
-  `CMakeFiles`, `x64`, `Win32`, `Debug`, `Release`
+  `CMakeFiles`, `.vs`, `x64`, `Win32`, `Debug`, `Release`
 - **Stray files**: `CMakeCache.txt`, `cmake_install.cmake`, `CTestTestfile.cmake`
 
 Anything inside `.git` is skipped. Source files are never removed.
@@ -81,5 +80,5 @@ cd d:\Algorithms
 
 - Both scripts are safe to run when there is nothing to clean — they simply
   report `Nothing to clean`.
-- Because the subprojects are git submodules, running either script cleans
+- Because the subprojects live in this monorepo, running either script cleans
   build output across all of them in one pass.

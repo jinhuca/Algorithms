@@ -6,18 +6,15 @@ module;
 // for vertices unreachable from src). Emits trace steps so a visualizer can
 // animate the frontier expanding level by level.
 
-#include <queue>
-#include <vector>
-
 export module ga.basic_algo.bfs;
 
+import std;
 import ga.graph;
 import ga.trace;
 
 export namespace ga {
-
-  template <class W>
-  std::vector<vertex> bfs(const graph<W>& g, vertex src, const tracer& trace = ignore) {
+  template <graph_like G>
+  std::vector<vertex> bfs(const G& g, vertex src, const tracer& trace = ignore) {
     std::vector<vertex> parent(g.order(), nil);
     std::vector<char> seen(g.order(), 0);
     std::queue<vertex> q;
@@ -49,5 +46,4 @@ export namespace ga {
     }
     return parent;
   }
-
 }  // namespace ga

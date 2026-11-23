@@ -32,6 +32,7 @@ mapfile -t DIRS < <(
       -name 'out'            -o \
       -name 'cmake-build-*'  -o \
       -name 'CMakeFiles'     -o \
+      -name '.vs'            -o \
       -name 'x64'            -o \
       -name 'Win32'          -o \
       -name 'Debug'          -o \

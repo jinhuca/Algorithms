@@ -24,7 +24,7 @@ static int failures = 0;
 
 // Canonical dump of every out-edge as (u, v, weight), sorted — for comparing two
 // graphs for exact equality (topology + weights).
-template <class W>
+template <typename W>
 static std::vector<std::tuple<ga::vertex, ga::vertex, W>> dump(const ga::graph<W>& g) {
     std::vector<std::tuple<ga::vertex, ga::vertex, W>> es;
     for (auto u : g.vertices())

@@ -12,19 +12,16 @@ module;
 // explicit stack grows on the heap instead. Each frame remembers how far u's
 // out-edges have been scanned, so descending into a child and later resuming the
 // parent reproduces the recursive trace order exactly.
-
-#include <cstddef>
-#include <vector>
-
 export module ga.basic_algo.dfs;
+import std;
 
 import ga.graph;
 import ga.trace;
 
 export namespace ga {
 
-  template <class W>
-  std::vector<vertex> dfs(const graph<W>& g, vertex src, const tracer& trace = ignore) {
+  template <graph_like G>
+  std::vector<vertex> dfs(const G& g, vertex src, const tracer& trace = ignore) {
     std::vector<vertex> parent(g.order(), nil);
     std::vector<char> seen(g.order(), 0);   // 0 = unseen, 1 = on stack, 2 = finished
 
@@ -45,7 +42,7 @@ export namespace ga {
       const vertex u = stack.back().u;
       const auto& edges = g.out(u);
       if(stack.back().i < edges.size()) {
-        const edge<W>& e = edges[stack.back().i];
+        const auto& e = edges[stack.back().i];
         ++stack.back().i;                   // advance BEFORE enter() (it may realloc `stack`)
         trace({evt::examine_edge, u, e.to});
         if(seen[e.to] == 0) {

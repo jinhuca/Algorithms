@@ -20,36 +20,55 @@
 // two run heads and an `overwrite` as each merged value is written back, so a
 // visualizer shows the two runs interleaving into place.
 
+#include <algorithm>
+#include <bit>
+#include <chrono>
+#include <cmath>
+#include <compare>
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <random>
+#include <ranges>
+#include <string>
+#include <tuple>
+#include <type_traits>
+#include <unordered_set>
+#include <utility>
 #include <vector>
-
 #include "../seq/seq.hpp"
 #include "../seq/trace.hpp"
 
 namespace sa {
-
   namespace detail {
-    template <class T, class Compare>
-    void merge_runs(std::vector<T>& a, std::vector<T>& buf,
-                    std::size_t lo, std::size_t mid, std::size_t hi,
-                    Compare& cmp, const tracer& trace) {
+    template <typename It, typename Buf, typename Compare>
+    void merge_runs(It a, Buf buf,
+      std::size_t lo, std::size_t mid, std::size_t hi,
+      Compare& cmp, const tracer& trace) {
       std::size_t i = lo, j = mid, k = lo;
-      while (i < mid && j < hi) {
+      while(i < mid && j < hi) {
         trace({.kind = evt::compare, .i = i, .j = j, .line = 2});
-        if (cmp(a[j], a[i])) buf[k++] = a[j++];   // strict < keeps it stable (ties take left)
+        if(cmp(a[j], a[i])) buf[k++] = a[j++];   // strict < keeps it stable (ties take left)
         else                 buf[k++] = a[i++];
       }
-      while (i < mid) buf[k++] = a[i++];
-      while (j < hi)  buf[k++] = a[j++];
-      for (std::size_t p = lo; p < hi; ++p) {
+      while(i < mid) buf[k++] = a[i++];
+      while(j < hi)  buf[k++] = a[j++];
+      for(std::size_t p = lo; p < hi; ++p) {
         a[p] = buf[p];
         trace({.kind = evt::overwrite, .i = p, .value = value_of(a[p]), .line = 4});
       }
     }
 
-    template <class T, class Compare>
-    void merge_sort_rec(std::vector<T>& a, std::vector<T>& buf,
-                        std::size_t lo, std::size_t hi, Compare& cmp, const tracer& trace) {
-      if (hi - lo <= 1) return;
+    template <typename It, typename Buf, typename Compare>
+    void merge_sort_rec(It a, Buf buf,
+      std::size_t lo, std::size_t hi, Compare& cmp, const tracer& trace) {
+      if(hi - lo <= 1) return;
       const std::size_t mid = lo + (hi - lo) / 2;
       merge_sort_rec(a, buf, lo, mid, cmp, trace);
       merge_sort_rec(a, buf, mid, hi, cmp, trace);
@@ -57,13 +76,14 @@ namespace sa {
     }
   }  // namespace detail
 
-  template <class T, class Compare = less>
-  void merge_sort(std::vector<T>& a, Compare cmp = {}, const tracer& trace = ignore) {
-    const std::size_t n = a.size();
-    if (n < 2) { if (n == 1) trace({.kind = evt::mark_sorted, .i = 0, .line = 0}); return; }
+  template <sortable R, typename Compare = less>
+  void merge_sort(R& data, Compare cmp = {}, const tracer& trace = ignore) {
+    using T = std::ranges::range_value_t<R>;
+    auto a = std::ranges::begin(data);           // mutable random-access iterator: a[i] is element i
+    const std::size_t n = std::ranges::size(data);
+    if(n < 2) { if(n == 1) trace({.kind = evt::mark_sorted, .i = 0, .line = 0}); return; }
     std::vector<T> buf(n);
-    detail::merge_sort_rec(a, buf, 0, n, cmp, trace);
+    detail::merge_sort_rec(a, buf.begin(), 0, n, cmp, trace);
     trace({.kind = evt::mark_sorted, .i = 0, .line = 0});
   }
-
 }  // namespace sa

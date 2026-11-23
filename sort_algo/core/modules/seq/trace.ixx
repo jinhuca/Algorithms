@@ -14,16 +14,12 @@ module;
 // bar height). So a single tracer type serves every sort, and a generic sort over
 // an arithmetic T fills `value`; for a non-arithmetic T it simply stays 0.
 
-#include <functional>
-#include <string>
-#include <type_traits>
-
 export module sa.trace;
 
+import std;
 import sa.seq;
 
 export namespace sa {
-
   enum class evt {
     compare,        // comparing a[i] with a[j]
     swap,           // a[i] and a[j] exchanged
@@ -52,10 +48,9 @@ export namespace sa {
   // Project an element to the double carried by write events (a bar height for the
   // visualizer). Numeric elements map to their value; any other T contributes 0 —
   // the trace positions still drive the animation either way.
-  template <class T>
+  template <typename T>
   inline double value_of(const T& x) {
-    if constexpr (std::is_arithmetic_v<T>) return static_cast<double>(x);
+    if constexpr(std::is_arithmetic_v<T>) return static_cast<double>(x);
     else return 0.0;
   }
-
 }  // namespace sa

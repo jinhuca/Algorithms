@@ -27,14 +27,31 @@
 // bar height). So a single tracer type serves every sort, and a generic sort over
 // an arithmetic T fills `value`; for a non-arithmetic T it simply stays 0.
 
+#include <algorithm>
+#include <bit>
+#include <chrono>
+#include <cmath>
+#include <compare>
+#include <concepts>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <iterator>
+#include <limits>
+#include <map>
+#include <numeric>
+#include <queue>
+#include <random>
+#include <ranges>
 #include <string>
+#include <tuple>
 #include <type_traits>
-
+#include <unordered_set>
+#include <utility>
+#include <vector>
 #include "seq.hpp"
 
 namespace sa {
-
   enum class evt {
     compare,        // comparing a[i] with a[j]
     swap,           // a[i] and a[j] exchanged
@@ -63,10 +80,9 @@ namespace sa {
   // Project an element to the double carried by write events (a bar height for the
   // visualizer). Numeric elements map to their value; any other T contributes 0 —
   // the trace positions still drive the animation either way.
-  template <class T>
+  template <typename T>
   inline double value_of(const T& x) {
-    if constexpr (std::is_arithmetic_v<T>) return static_cast<double>(x);
+    if constexpr(std::is_arithmetic_v<T>) return static_cast<double>(x);
     else return 0.0;
   }
-
 }  // namespace sa

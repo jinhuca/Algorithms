@@ -32,7 +32,7 @@ static int failures = 0;
     } while (0)
 
 // Is `v` a non-decreasing permutation of `original`?
-template <class T>
+template <typename T>
 static bool is_sorted_perm(std::vector<T> v, std::vector<T> original) {
     const bool ordered = std::is_sorted(v.begin(), v.end());
     std::sort(v.begin(), v.end());
@@ -146,8 +146,11 @@ int main() {
         CHECK(w2 == want);
     }
 
-    // --- the sortable concept accepts a vector, rejects a plain int ---
-    static_assert(sa::sortable<std::vector<int>>);
+    // --- concept checks: a (mutable) vector is sortable; a const vector is NOT (sorts
+    //     permute in place); counting/arithmetic concepts; orderable accepts int/string ---
+    static_assert(sa::sortable<std::vector<int>> && !sa::sortable<const std::vector<int>>);
+    static_assert(sa::counting_sortable<std::vector<std::string>> &&
+                  sa::arithmetically_sortable<std::vector<double>>);
     static_assert(sa::orderable<int> && sa::orderable<std::string>);
 
     if (failures == 0) std::printf("OK: all sort core checks passed\n");

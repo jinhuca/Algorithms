@@ -7,7 +7,7 @@ research (benchmark sorts across input distributions and sizes). Sibling to
 
 ![Sort Race — several algorithms sorting the same array side by side](docs/race.png)
 
-Ten sorts across three complexity categories, each implemented as a C++20 module:
+Twelve sorts across three complexity categories, each implemented as a C++20 module:
 
 - **O(n²)** — Bubble, Selection, Insertion, Cocktail, Cycle
 - **O(n log n)** — Merge, Quick, Heap

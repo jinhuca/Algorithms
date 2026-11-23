@@ -35,7 +35,7 @@ for /f "delims=" %%D in ('dir /s /b /a:d 2^>nul') do (
   if errorlevel 1 (
     set "name=%%~nxD"
     set "match=0"
-    for %%N in (build out CMakeFiles x64 Win32 Debug Release) do if /i "!name!"=="%%N" set "match=1"
+    for %%N in (build out CMakeFiles .vs x64 Win32 Debug Release) do if /i "!name!"=="%%N" set "match=1"
     if /i "!name:~0,6!"=="build-"      set "match=1"
     if /i "!name:~0,12!"=="cmake-build-" set "match=1"
     if "!match!"=="1" if exist "%%D\" (

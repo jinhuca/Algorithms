@@ -13,6 +13,12 @@
 #include <ga/short_paths/bellman_ford.hpp>
 #include <ga/short_paths/dijkstra.hpp>
 
+// The concrete ga::graph satisfies the graph_like concept the algorithms require,
+// for any weight type; weight_t recovers the edge weight type.
+static_assert(ga::graph_like<ga::graph<double>>);
+static_assert(ga::graph_like<ga::graph<int>>);
+static_assert(std::is_same_v<ga::weight_t<ga::graph<int>>, int>);
+
 static int failures = 0;
 #define CHECK(cond)                                                       \
     do {                                                                  \

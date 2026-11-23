@@ -9,36 +9,33 @@ module;
 // there are few distinct keys (the "few unique" workload). Emits a `read` as it tallies
 // each element and an `overwrite` as it writes the sorted output. Ascending only.
 
-#include <cstddef>
-#include <map>
-#include <vector>
-
 export module sa.advanced_sorts.counting;
 
+import std;
 import sa.seq;
 import sa.trace;
 
 export namespace sa {
-
-  template <class T>
-  void counting_sort(std::vector<T>& a, const tracer& trace = ignore) {
-    const std::size_t n = a.size();
-    if (n < 2) { if (n == 1) trace({.kind = evt::mark_sorted, .i = 0, .line = 1}); return; }
+  template <counting_sortable R>
+  void counting_sort(R& data, const tracer& trace = ignore) {
+    using T = std::ranges::range_value_t<R>;
+    auto a = std::ranges::begin(data);           // mutable random-access iterator: a[i] is element i
+    const std::size_t n = std::ranges::size(data);
+    if(n < 2) { if(n == 1) trace({.kind = evt::mark_sorted, .i = 0, .line = 1}); return; }
 
     std::map<T, std::size_t> counts;                  // key -> occurrences (ordered)
-    for (std::size_t i = 0; i < n; ++i) {
+    for(std::size_t i = 0; i < n; ++i) {
       ++counts[a[i]];
       trace({.kind = evt::read, .i = i, .value = value_of(a[i]), .line = 0});
     }
 
     std::size_t pos = 0;
-    for (const auto& [key, cnt] : counts)
-      for (std::size_t c = 0; c < cnt; ++c) {
+    for(const auto& [key, cnt] : counts)
+      for(std::size_t c = 0; c < cnt; ++c) {
         a[pos] = key;
         trace({.kind = evt::overwrite, .i = pos, .value = value_of(a[pos]), .line = 2});
         ++pos;
       }
     trace({.kind = evt::mark_sorted, .i = 0, .line = 1});
   }
-
 }  // namespace sa

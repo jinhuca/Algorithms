@@ -12,17 +12,12 @@ module;
 // `step` is intentionally element-agnostic: it carries plain positions (indices) plus
 // a double `value` used only to show the probed element's height. So a single tracer
 // type serves every search.
-
-#include <functional>
-#include <string>
-#include <type_traits>
-
 export module se.trace;
 
+import std;
 import se.seq;
 
 export namespace se {
-
   enum class evt {
     probe,          // examining a[i] — comparing a[i] against the target
     lo_bound,       // the search window's lower bound moved to i (sorted searches)
@@ -52,10 +47,9 @@ export namespace se {
   // Project an element to the double carried by a step (a bar height for the
   // visualizer). Numeric elements map to their value; any other T contributes 0 —
   // the trace positions still drive the animation either way.
-  template <class T>
+  template <typename T>
   inline double value_of(const T& x) {
-    if constexpr (std::is_arithmetic_v<T>) return static_cast<double>(x);
+    if constexpr(std::is_arithmetic_v<T>) return static_cast<double>(x);
     else return 0.0;
   }
-
 }  // namespace se
