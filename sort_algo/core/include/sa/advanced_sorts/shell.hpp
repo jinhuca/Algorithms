@@ -48,7 +48,8 @@
 #include "../seq/trace.hpp"
 
 namespace sa {
-  template <sortable R, typename Compare = less>
+  template <typename R, typename Compare = less>
+    requires sortable<R, Compare>
   void shell_sort(R& data, Compare cmp = {}, const tracer& trace = ignore) {
     using T = std::ranges::range_value_t<R>;
     auto a = std::ranges::begin(data);           // mutable random-access iterator: a[i] is element i

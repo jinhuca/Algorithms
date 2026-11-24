@@ -64,7 +64,8 @@ namespace sa {
     }
   }  // namespace detail
 
-  template <sortable R, typename Compare = less>
+  template <typename R, typename Compare = less>
+    requires sortable<R, Compare>
   void heap_sort(R& data, Compare cmp = {}, const tracer& trace = ignore) {
     auto a = std::ranges::begin(data);           // mutable random-access iterator: a[i] is element i
     const std::size_t n = std::ranges::size(data);
