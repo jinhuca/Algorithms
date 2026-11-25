@@ -19,6 +19,8 @@
 // Incremental model backing the Analyzer's results table: rows are appended one at a
 // time so the ListView only creates the new row's delegates. Exposes the row map plus
 // a size-group boundary flag.
+namespace se::studio {
+
 class AnalyzerResultsModel : public QAbstractListModel {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
@@ -148,3 +150,5 @@ private:
     QTimer m_flush;
     bool m_resultsDirty = false;
 };
+
+}  // namespace se::studio

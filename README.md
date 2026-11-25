@@ -7,11 +7,13 @@ The three studios share one architecture and one UI design system.
 
 | Project | Namespace | What it covers | Docs |
 | --- | --- | --- | --- |
+| [algorithms_studio](algorithms_studio/) — **Algorithms** umbrella app | — | one window hosting every studio (home cards + shared theme) | — |
 | [search_algo](search_algo/) — Search Algorithm Studio | `se::` | 8 search algorithms | [README](search_algo/README.md) · [ARCHITECTURE](search_algo/ARCHITECTURE.md) |
 | [sort_algo](sort_algo/) — Sort Algorithm Studio | `sa::` | 12 sorting algorithms | [README](sort_algo/README.md) · [ARCHITECTURE](sort_algo/ARCHITECTURE.md) |
 | [graph_algo](graph_algo/) — Graph Algorithm Studio | `ga::` | graph + 6 graph algorithms | [README](graph_algo/README.md) · [ARCHITECTURE](graph_algo/ARCHITECTURE.md) |
+| foundation_algo / combinatorics_algo / numerics_algo | `fo::` `cb::` `nu::` | scaffolded skeleton studios (home cards wired; content pending) | — |
 | [UI_repo](UI_repo/) — UiKit | — | shared Qt/QML design system | [README](UI_repo/README.md) |
-| [scripts/](scripts/) | — | cross-project build-output cleanup | [README](scripts/README.md) |
+| [scripts/](scripts/) | — | unified header generator · installers · build-output cleanup | [README](scripts/README.md) |
 
 ## The projects
 
@@ -48,9 +50,16 @@ can't rely on C++ modules / `import std`, a small Python generator produces a
 **header-only twin** of each module under `core/include/<ns>/**/*.hpp`:
 
 ```sh
-py -I scripts/gen_<ns>_hpp.py          # regenerate the .hpp twins from the .ixx
-py -I scripts/gen_<ns>_hpp.py --check  # CI / pre-commit: fail if a twin is stale
+# One unified generator for every core (ns = sa | se | ga | fo | cb | nu):
+py -I scripts/gen_hpp.py --project <project> --ns <ns>           # regenerate the twins
+py -I scripts/gen_hpp.py --project <project> --ns <ns> --check   # CI: fail if a twin is stale
+
+scripts/gen-all-headers.sh           # regenerate every core's twins in one pass
+scripts/gen-all-headers.sh --check   # CI / pre-commit: fail if any twin is stale
 ```
+
+(Each studio also keeps a thin `scripts/gen_<ns>_hpp.py` shim that forwards to the
+unified generator, so the old per-project command still works.)
 
 The generator strips the module scaffolding and **expands `import std;` into the
 equivalent `#include` set** so the twins compile under plain C++20 (GCC ≥ 11 / MinGW).
@@ -104,9 +113,12 @@ Override the UiKit location with the project's `*_UI_REPO` cache var if it isn't
 `./UI_repo`. `search_algo` also has a one-shot `scripts/setup.sh` that auto-detects the
 toolchain and builds + tests.
 
-**C++20 modules (MSVC / Visual Studio 2026):** open `core/<project>.slnx` to build the
-`.ixx` modules directly; the `.ixx` use `import std;` (with `BuildStlModules` enabled).
-After editing a `.ixx`, regenerate the header twins with the generator above.
+**C++20 modules (MSVC / Visual Studio 2026):** open the top-level **`Algorithms.slnx`**
+to work on every core's `.ixx` modules in one solution (grouped per project), or a single
+`core/<project>.slnx` for just one. The `.ixx` use `import std;` (with `BuildStlModules`
+enabled). After editing a `.ixx`, regenerate the header twins with the generator above.
+(In the Qt/CMake build, each studio module also lists its core's generated `.hpp` twins
+so they're browsable in Qt Creator — they're header-only, not recompiled there.)
 
 **Clean build output** across every project in one pass:
 
@@ -118,11 +130,27 @@ After editing a `.ixx`, regenerate the header twins with the generator above.
 
 ```
 Algorithms/
+├─ CMakeLists.txt       top-level build: cores (+ tests), and -DALGORITHMS_BUILD_APP → the umbrella
+├─ algorithms_studio/   the Algorithms umbrella app (hosts every studio in one window)
 ├─ search_algo/   core/ (modules + include twins + tests) · studio/ · scripts/
 ├─ sort_algo/     core/ (…) · studio/ · scripts/
 ├─ graph_algo/    core/ (…) · studio/ · scripts/
+├─ foundation_algo/ combinatorics_algo/ numerics_algo/   scaffolded skeleton studios
 ├─ UI_repo/       UiKit — shared Qt/QML design system (consumed via add_subdirectory)
-└─ scripts/       clean-builds.{sh,cmd} — build-output cleanup
+└─ scripts/       gen_hpp.py + gen-all-headers.{sh,cmd} · package-all.ps1 · clean-builds.{sh,cmd}
+```
+
+**The umbrella app** (all studios in one window) builds from the top level:
+
+```sh
+cmake -S . -B build-app -G Ninja -DCMAKE_PREFIX_PATH=<Qt>/mingw_64 -DALGORITHMS_BUILD_APP=ON
+cmake --build build-app        # → build-app/algorithms_studio.exe
+```
+
+Package every installer (umbrella + each studio) in one pass (Windows; needs Inno Setup):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\package-all.ps1 [-Trim] [-Minimal]
 ```
 
 See each project's `README.md` and `ARCHITECTURE.md` for full detail.

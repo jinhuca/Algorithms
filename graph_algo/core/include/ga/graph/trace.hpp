@@ -3,10 +3,10 @@
 // ============================================================================
 // GENERATED FILE -- DO NOT EDIT.
 // Header-only twin of trace.ixx (the C++20 module), produced by
-// scripts/gen_ga_hpp.py. The .ixx is the source of truth: edit it and re-run
-//   py -I scripts/gen_ga_hpp.py
-// This header lets the Qt/MinGW visualizer and the tests use the ga core
-// without C++20 modules / `import std`.
+//   py -I scripts/gen_hpp.py --project graph_algo --ns ga
+// The .ixx is the source of truth: edit it and re-run the generator. This header
+// lets the Qt/MinGW app and the tests use the ga core without C++20 modules /
+// `import std`.
 // ============================================================================
 
 #if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ < 11)
@@ -33,6 +33,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iterator>
 #include <limits>
 #include <map>
 #include <numeric>

@@ -48,8 +48,13 @@ set(SA_FULL_VERSION "${SA_VERSION}.${SA_BUILD}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/version.h" @ONLY)
 
-qt_add_executable(sort_algorithm_studio
-    main.cpp
+# ---- studio module library: controllers + the QML module -------------------
+# The studio content is a static library + QML module (URI SortStudio) so it can be
+# linked into either the standalone executable below or the Algorithms umbrella app.
+# main.cpp and mem_tracker.cpp (global operator new/delete) stay in the executable
+# only — a process can have exactly one global allocator override, so the umbrella
+# supplies its own and must not pull in each studio's.
+qt_add_library(sortstudio STATIC
     VisualizerController.cpp
     VisualizerController.h
     AnalyzerController.cpp
@@ -62,31 +67,17 @@ qt_add_executable(sort_algorithm_studio
     SortAudio.h
     RaceController.cpp
     RaceController.h
-    mem_tracker.cpp
 )
-
-# GUI-subsystem app (no console window).
-set_target_properties(sort_algorithm_studio PROPERTIES WIN32_EXECUTABLE TRUE)
-
-# Generated version.h (configure_file above) lives in the build dir.
-target_include_directories(sort_algorithm_studio PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
-
-# Embed the application icon (sa_logo) into the Windows executable.
-if (WIN32)
-    enable_language(RC)
-    set_source_files_properties(appicon.rc PROPERTIES
-        COMPILE_FLAGS "-I\"${CMAKE_CURRENT_SOURCE_DIR}\"")
-    target_sources(sort_algorithm_studio PRIVATE appicon.rc)
-endif()
 
 set_source_files_properties(qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 qt_policy(SET QTP0004 NEW)
 
-qt_add_qml_module(sort_algorithm_studio
+qt_add_qml_module(sortstudio
     URI SortStudio
     VERSION 1.0
     QML_FILES
         qml/Main.qml
+        qml/SortRoot.qml
         qml/Theme.qml
         qml/TitleBar.qml
         qml/HomePage.qml
@@ -111,10 +102,46 @@ qt_add_qml_module(sort_algorithm_studio
         sa_logo.svg
 )
 
-target_link_libraries(sort_algorithm_studio
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Multimedia sa::core UiKit UiKitplugin)
+# PUBLIC so whatever links this library (the standalone exe or the umbrella app)
+# transitively gets the Qt modules, sa::core and the shared UiKit module + plugin.
+target_link_libraries(sortstudio
+    PUBLIC Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Multimedia sa::core UiKit UiKitplugin)
+
+# The studio library reads the generated version.h (SA_APP_VERSION) to expose the
+# build-stamped version to QML (VisualizerController::appVersion).
+target_include_directories(sortstudio PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 # psapi: GetProcessMemoryInfo (process working set); pdh: GPU-engine utilisation.
 if (WIN32)
-    target_link_libraries(sort_algorithm_studio PRIVATE psapi pdh)
+    target_link_libraries(sortstudio PUBLIC psapi pdh)
+endif()
+
+# ---- standalone executable -------------------------------------------------
+qt_add_executable(sort_algorithm_studio main.cpp mem_tracker.cpp)
+
+# GUI-subsystem app (no console window).
+set_target_properties(sort_algorithm_studio PROPERTIES WIN32_EXECUTABLE TRUE)
+
+# Generated version.h (configure_file above) lives in the build dir.
+target_include_directories(sort_algorithm_studio PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
+# Embed the application icon (sa_logo) into the Windows executable.
+if (WIN32)
+    enable_language(RC)
+    set_source_files_properties(appicon.rc PROPERTIES
+        COMPILE_FLAGS "-I\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+    target_sources(sort_algorithm_studio PRIVATE appicon.rc)
+endif()
+
+# Link the studio module + its generated QML plugin (static-plugin registration).
+target_link_libraries(sort_algorithm_studio PRIVATE sortstudio sortstudioplugin)
+
+# IDE convenience: surface the core's generated header twins (../core/include/sa/**/*.hpp)
+# under this module in Qt Creator so they're navigable alongside the studio. They are
+# header-only (already consumed via sa::core's include path); listing them as target
+# sources does NOT compile them — it only makes them show in the project tree.
+file(GLOB_RECURSE _sa_core_twins CONFIGURE_DEPENDS
+     "${CMAKE_CURRENT_SOURCE_DIR}/../core/include/sa/*.hpp")
+if (_sa_core_twins)
+    target_sources(sortstudio PRIVATE ${_sa_core_twins})
 endif()

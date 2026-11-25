@@ -16,6 +16,8 @@
 // sorts keep the rainbow locally ascending within each key group; unstable ones
 // scramble it. Reuses the real sa::core sorts (generic over the element type) — no
 // core changes; only the comparison sorts are offered (radix is non-comparison).
+namespace sa::studio {
+
 class StabilityController : public QObject {
     Q_OBJECT
     QML_ELEMENT
@@ -64,3 +66,5 @@ private:
     int m_count = 0, m_keyLevels = 0;
     bool m_stable = true;
 };
+
+}  // namespace sa::studio

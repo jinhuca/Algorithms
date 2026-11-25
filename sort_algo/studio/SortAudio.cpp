@@ -13,6 +13,8 @@
 #  define M_PI 3.14159265358979323846
 #endif
 
+namespace sa::studio {
+
 // A pull-mode QIODevice that synthesises a mono 16-bit sine with a per-note decay
 // envelope. The audio sink reads from it continuously; trigger() (called from the
 // GUI thread) re-arms the envelope and sets the pitch via atomics.
@@ -83,3 +85,5 @@ void SortAudio::ping(double v01) {
     if (v01 > 1.0) v01 = 1.0;
     m_tone->trigger(220.0 + v01 * (1200.0 - 220.0));   // map value -> 220..1200 Hz
 }
+
+}  // namespace sa::studio

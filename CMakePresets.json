@@ -1,0 +1,37 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "algorithms-app",
+      "displayName": "Algorithms umbrella app (Debug)",
+      "description": "Build the Algorithms umbrella app + every studio module (ALGORITHMS_BUILD_APP=ON). Pick this in Qt Creator; the selected kit supplies Qt + the compiler.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-app",
+      "cacheVariables": {
+        "ALGORITHMS_BUILD_APP": "ON",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "algorithms-app-release",
+      "inherits": "algorithms-app",
+      "displayName": "Algorithms umbrella app (Release)",
+      "binaryDir": "${sourceDir}/build-app-release",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "cores-tests",
+      "displayName": "Cores + tests (no Qt)",
+      "description": "Header-only cores and their ctest suites only — no Qt needed.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "algorithms-app", "configurePreset": "algorithms-app", "targets": ["algorithms_studio"] },
+    { "name": "algorithms-app-release", "configurePreset": "algorithms-app-release", "targets": ["algorithms_studio"] },
+    { "name": "cores-tests", "configurePreset": "cores-tests" }
+  ]
+}

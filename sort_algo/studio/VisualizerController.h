@@ -12,6 +12,8 @@
 
 #include <sa/seq/trace.hpp>
 
+namespace sa::studio {
+
 // Per-bar model backing the Visualizer canvas: one row per array element, carrying
 // its current value (bar height) and its playback state (idle / comparing / swapping
 // / cursor / sorted). The controller drives it as it replays a recorded sort trace;
@@ -85,6 +87,7 @@ class VisualizerController : public QObject {
     Q_OBJECT
     QML_ELEMENT
 
+    Q_PROPERTY(QString appVersion READ appVersion CONSTANT)   // full Major.Minor.Patch.Build (version.h)
     Q_PROPERTY(QObject* bars READ bars CONSTANT)
     Q_PROPERTY(QStringList algorithms READ algorithms CONSTANT)
     Q_PROPERTY(QStringList categories READ categories CONSTANT)
@@ -106,6 +109,8 @@ class VisualizerController : public QObject {
 
 public:
     explicit VisualizerController(QObject* parent = nullptr);
+
+    QString appVersion() const;   // SA_APP_VERSION from the generated version.h
 
     QObject* bars() { return &m_bars; }
     // Flat list (every algorithm) and the category grouping used by the pickers.
@@ -205,3 +210,5 @@ private:
     double m_stepValue = 0.0;         // current operand value normalised to 0..1
     bool m_descending = false;        // sort order (comparison sorts); radix stays ascending
 };
+
+}  // namespace sa::studio

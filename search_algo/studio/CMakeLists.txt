@@ -48,37 +48,26 @@ set(SE_FULL_VERSION "${SE_VERSION}.${SE_BUILD}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/version.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/version.h" @ONLY)
 
-qt_add_executable(search_algorithm_studio
-    main.cpp
+# ---- studio module library: controllers + the QML module -------------------
+# The studio content is a static library + QML module (URI SearchStudio) so it can be
+# linked into either the standalone executable below or the Algorithms umbrella app.
+# main.cpp stays in the executable only.
+qt_add_library(searchstudio STATIC
     VisualizerController.cpp
     VisualizerController.h
     AnalyzerController.cpp
     AnalyzerController.h
 )
 
-# GUI-subsystem app (no console window).
-set_target_properties(search_algorithm_studio PROPERTIES WIN32_EXECUTABLE TRUE)
-
-# Generated version.h (configure_file above) lives in the build dir.
-target_include_directories(search_algorithm_studio PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
-
-# Embed the application icon (search_logo) into the Windows executable.
-if (WIN32)
-    enable_language(RC)
-    set_source_files_properties(appicon.rc PROPERTIES
-        COMPILE_FLAGS "-I\"${CMAKE_CURRENT_SOURCE_DIR}\""
-        OBJECT_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/search_logo.ico")
-    target_sources(search_algorithm_studio PRIVATE appicon.rc)
-endif()
-
 set_source_files_properties(qml/Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 qt_policy(SET QTP0004 NEW)
 
-qt_add_qml_module(search_algorithm_studio
+qt_add_qml_module(searchstudio
     URI SearchStudio
     VERSION 1.0
     QML_FILES
         qml/Main.qml
+        qml/SearchRoot.qml
         qml/Theme.qml
         qml/TitleBar.qml
         qml/HomePage.qml
@@ -97,5 +86,42 @@ qt_add_qml_module(search_algorithm_studio
         search_logo.svg
 )
 
-target_link_libraries(search_algorithm_studio
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Svg se::core UiKit UiKitplugin)
+# PUBLIC so whatever links this library (the standalone exe or the umbrella app)
+# transitively gets the Qt modules, se::core and the shared UiKit module + plugin.
+target_link_libraries(searchstudio
+    PUBLIC Qt6::Quick Qt6::QuickControls2 Qt6::Widgets Qt6::Svg se::core UiKit UiKitplugin)
+
+# Lets the studio library read the generated version.h (SE_APP_VERSION) for
+# VisualizerController::appVersion (shown in the umbrella title bar).
+target_include_directories(searchstudio PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
+# ---- standalone executable -------------------------------------------------
+qt_add_executable(search_algorithm_studio main.cpp)
+
+# GUI-subsystem app (no console window).
+set_target_properties(search_algorithm_studio PROPERTIES WIN32_EXECUTABLE TRUE)
+
+# Generated version.h (configure_file above) lives in the build dir.
+target_include_directories(search_algorithm_studio PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
+# Embed the application icon (search_logo) into the Windows executable.
+if (WIN32)
+    enable_language(RC)
+    set_source_files_properties(appicon.rc PROPERTIES
+        COMPILE_FLAGS "-I\"${CMAKE_CURRENT_SOURCE_DIR}\""
+        OBJECT_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/search_logo.ico")
+    target_sources(search_algorithm_studio PRIVATE appicon.rc)
+endif()
+
+# Link the studio module + its generated QML plugin (static-plugin registration).
+target_link_libraries(search_algorithm_studio PRIVATE searchstudio searchstudioplugin)
+
+# IDE convenience: surface the core's generated header twins (../core/include/se/**/*.hpp)
+# under this module in Qt Creator so they're navigable alongside the studio. They are
+# header-only (already consumed via se::core's include path); listing them as target
+# sources does NOT compile them — it only makes them show in the project tree.
+file(GLOB_RECURSE _se_core_twins CONFIGURE_DEPENDS
+     "${CMAKE_CURRENT_SOURCE_DIR}/../core/include/se/*.hpp")
+if (_se_core_twins)
+    target_sources(searchstudio PRIVATE ${_se_core_twins})
+endif()

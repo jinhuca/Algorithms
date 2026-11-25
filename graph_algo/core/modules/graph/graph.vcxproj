@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a1111111-1111-4111-8111-111111111111}</ProjectGuid>
+    <ProjectGuid>{43595136-dd95-4096-9595-93a0321717eb}</ProjectGuid>
     <RootNamespace>gagraph</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

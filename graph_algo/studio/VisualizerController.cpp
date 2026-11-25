@@ -3,6 +3,8 @@
 // run + playback in VisualizerController_run.cpp (same class, split for size).
 #include "VisualizerController.h"
 
+#include "version.h"   // GA_APP_VERSION (generated)
+
 #include <QElapsedTimer>
 #include <QFile>
 #include <QJsonArray>
@@ -22,6 +24,10 @@
 #include <ga/basic_algo/dfs.hpp>
 #include <ga/short_paths/bellman_ford.hpp>
 #include <ga/short_paths/dijkstra.hpp>
+
+namespace ga::studio {
+
+QString VisualizerController::appVersion() const { return QStringLiteral(GA_APP_VERSION); }
 
 VisualizerController::VisualizerController(QObject* parent) : QObject(parent) {
     loadSample();
@@ -503,4 +509,6 @@ void VisualizerController::loadNamedSample(const QString& name) {
     resetRun();
     emit graphChanged();
 }
+
+}  // namespace ga::studio
 

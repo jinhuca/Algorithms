@@ -1,5 +1,7 @@
 #include "VisualizerController.h"
 
+#include "version.h"   // SE_APP_VERSION (generated)
+
 #include <QVector>
 
 #include <algorithm>
@@ -14,6 +16,10 @@
 #include <se/sorted_searches/exponential.hpp>
 #include <se/sorted_searches/interpolation.hpp>
 #include <se/sorted_searches/fibonacci.hpp>
+
+namespace se::studio {
+
+QString VisualizerController::appVersion() const { return QStringLiteral(SE_APP_VERSION); }
 
 VisualizerController::VisualizerController(QObject* parent) : QObject(parent) {
     generate(32, 1);   // a small demo array so the canvas isn't empty on launch
@@ -224,3 +230,5 @@ void VisualizerController::seek(int target) {
     m_cursor = target;
     render();
 }
+
+}  // namespace se::studio

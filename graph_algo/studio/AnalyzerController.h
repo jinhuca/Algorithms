@@ -22,6 +22,8 @@
 // time (begin/endInsertRows) so the ListView only creates the new row's delegates
 // instead of rebuilding every row on each streamed result. Exposes the whole row map
 // (RowData) and a precomputed size-group boundary flag (GroupStart, O(1)).
+namespace ga::studio {
+
 class AnalyzerResultsModel : public QAbstractListModel {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
@@ -182,3 +184,5 @@ private:
     QTimer m_flush;                      // GUI thread
     bool m_resultsDirty = false;
 };
+
+}  // namespace ga::studio

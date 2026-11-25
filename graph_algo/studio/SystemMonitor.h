@@ -11,6 +11,8 @@
 // QML sparklines can advance even when a value is unchanged. Intentionally tiny
 // compared to the Crystal_Qt telemetry app (no PDH/WMI/COM) — all Win32, only the
 // psapi link added. Set `active` (e.g. bound to page visibility) to start/stop.
+namespace ga::studio {
+
 class SystemMonitor : public QObject {
     Q_OBJECT
     QML_ELEMENT
@@ -64,3 +66,5 @@ private:
     void* m_pdhQuery = nullptr;        // PDH_HQUERY
     void* m_pdhGpu = nullptr;          // PDH_HCOUNTER ( \GPU Engine(*)\Utilization Percentage )
 };
+
+}  // namespace ga::studio

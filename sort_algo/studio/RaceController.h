@@ -13,6 +13,8 @@
 
 #include "VisualizerController.h"   // reuse BarModel
 
+namespace sa::studio {
+
 // One racing lane: an algorithm's recorded trace replayed on its own copy of the
 // shared array, into its own BarModel. Lanes all step forward in lockstep (one trace
 // step per tick); a lane with fewer steps finishes sooner, so the race is by
@@ -106,3 +108,5 @@ private:
     int m_finishedCount = 0;
     int m_size = 0;
 };
+
+}  // namespace sa::studio

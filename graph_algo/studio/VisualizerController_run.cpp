@@ -25,6 +25,8 @@
 #include <ga/short_paths/bellman_ford.hpp>
 #include <ga/short_paths/dijkstra.hpp>
 
+namespace ga::studio {
+
 // ---- algorithm + playback ------------------------------------------------
 
 ga::graph<double> VisualizerController::buildGraph(bool directed) const {
@@ -341,3 +343,5 @@ void VisualizerController::clearPath() {
     m_pathSummary.clear();
     emit pathChanged();
 }
+
+}  // namespace ga::studio

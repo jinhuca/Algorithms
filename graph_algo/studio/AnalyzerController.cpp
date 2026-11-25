@@ -30,6 +30,8 @@
 #  include <windows.h>
 #endif
 
+namespace ga::studio {
+
 AnalyzerController::AnalyzerController(QObject* parent) : QObject(parent) {
     // Coalesce chart updates: a dirty flag armed per cell is flushed at most ~8×/sec.
     m_flush.setInterval(120);
@@ -447,3 +449,5 @@ bool AnalyzerController::exportCsv(const QUrl& url) const {
     }
     return true;
 }
+
+}  // namespace ga::studio

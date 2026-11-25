@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c3333333-3333-4333-8333-333333333333}</ProjectGuid>
+    <ProjectGuid>{30a20a77-fe24-4bc6-9d85-a2f7f32bcf31}</ProjectGuid>
     <RootNamespace>segen</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

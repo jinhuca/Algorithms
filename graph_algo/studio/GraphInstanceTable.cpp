@@ -4,6 +4,8 @@
 #include <QQuaternion>
 #include <QVector3D>
 
+namespace ga::studio {
+
 void GraphInstanceTable::setEntries(const QList<double>& flat) {
     constexpr int stride = 14;   // px,py,pz, sx,sy,sz, qw,qx,qy,qz, r,g,b,a
     const int n = flat.size() / stride;
@@ -30,3 +32,5 @@ QByteArray GraphInstanceTable::getInstanceBuffer(int* instanceCount) {
         *instanceCount = m_count;
     return m_buffer;
 }
+
+}  // namespace ga::studio

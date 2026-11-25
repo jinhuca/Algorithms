@@ -17,6 +17,8 @@
 // found). The controller drives it as it replays a recorded search trace; QML binds a
 // Repeater to it so only the changed bars repaint. Unlike the sort studio the values
 // never change (a search only reads), so only the per-bar state moves.
+namespace se::studio {
+
 class BarModel : public QAbstractListModel {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
@@ -85,6 +87,7 @@ class VisualizerController : public QObject {
     Q_OBJECT
     QML_ELEMENT
 
+    Q_PROPERTY(QString appVersion READ appVersion CONSTANT)   // full Major.Minor.Patch.Build (version.h)
     Q_PROPERTY(QObject* bars READ bars CONSTANT)
     Q_PROPERTY(QStringList categories READ categories CONSTANT)
     Q_PROPERTY(QStringList distributions READ distributions CONSTANT)
@@ -108,6 +111,8 @@ class VisualizerController : public QObject {
 
 public:
     explicit VisualizerController(QObject* parent = nullptr);
+
+    QString appVersion() const;   // SE_APP_VERSION from the generated version.h
 
     QObject* bars() { return &m_bars; }
     QStringList categories() const {
@@ -205,3 +210,5 @@ private:
     QString m_stepKind;
     int m_stepLine = -1;
 };
+
+}  // namespace se::studio

@@ -3,8 +3,11 @@
 #include <QObject>
 #include <QtQmlIntegration>
 
-class QAudioSink;
-class ToneSource;
+class QAudioSink;   // global Qt type — stays outside the studio namespace
+
+namespace sa::studio {
+
+class ToneSource;   // internal helper, defined in SortAudio.cpp
 
 // Tiny audio engine for the Visualizer: a continuously-running QAudioSink fed by a
 // sine oscillator with a fast-decaying envelope. ping(v) retriggers a short blip
@@ -35,3 +38,5 @@ private:
     QAudioSink* m_sink = nullptr;
     ToneSource* m_tone = nullptr;
 };
+
+}  // namespace sa::studio

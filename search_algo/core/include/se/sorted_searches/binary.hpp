@@ -3,10 +3,10 @@
 // ============================================================================
 // GENERATED FILE -- DO NOT EDIT.
 // Header-only twin of binary.ixx (the C++20 module), produced by
-// scripts/gen_se_hpp.py. The .ixx is the source of truth: edit it and re-run
-//   py -I scripts/gen_se_hpp.py
-// This header lets the Qt/MinGW app and the tests use the se core without
-// C++20 modules / `import std`.
+//   py -I scripts/gen_hpp.py --project search_algo --ns se
+// The .ixx is the source of truth: edit it and re-run the generator. This header
+// lets the Qt/MinGW app and the tests use the se core without C++20 modules /
+// `import std`.
 // ============================================================================
 
 #if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ < 11)
@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iterator>
 #include <limits>
 #include <map>
 #include <numeric>

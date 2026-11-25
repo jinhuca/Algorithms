@@ -23,6 +23,8 @@
 #include <ga/short_paths/bellman_ford.hpp>
 #include <ga/short_paths/dijkstra.hpp>
 
+namespace ga::studio {
+
 QString VisualizerController::toJson() const {
     QJsonObject root;
     root[QStringLiteral("directed")] = m_directed;
@@ -159,4 +161,6 @@ void VisualizerController::finishAsyncLoad(ParsedDoc doc) {
     m_loading = false;
     emit loadingChanged();
 }
+
+}  // namespace ga::studio
 

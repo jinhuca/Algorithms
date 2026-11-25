@@ -17,9 +17,13 @@
 // + weighted edges), runs a ga::core algorithm with a recording tracer, folds
 // the emitted ga::step stream into one visual snapshot per step, and exposes a
 // playback cursor the QML canvas binds to. See ../ARCHITECTURE.md.
+namespace ga::studio {
+
 class VisualizerController : public QObject {
     Q_OBJECT
     QML_ELEMENT
+
+    Q_PROPERTY(QString appVersion READ appVersion CONSTANT)   // full Major.Minor.Patch.Build (version.h)
 
     // --- graph model ---
     Q_PROPERTY(QVariantList nodes READ nodes NOTIFY graphChanged)        // [{id,label,x,y}]
@@ -65,6 +69,8 @@ class VisualizerController : public QObject {
 
 public:
     explicit VisualizerController(QObject* parent = nullptr);
+
+    QString appVersion() const;   // GA_APP_VERSION from the generated version.h
 
     // Vertex playback states (indices into the Theme state colours).
     enum State { Idle = 0, Frontier = 1, Current = 2, Settled = 3 };
@@ -215,3 +221,5 @@ private:
     std::vector<QPair<int, int>> m_pathEdges;   // parent→child pairs on the path
     QString m_pathSummary;
 };
+
+}  // namespace ga::studio

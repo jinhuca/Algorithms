@@ -16,6 +16,8 @@
 #include <thread>
 #include <vector>
 
+namespace sa::studio {
+
 // Incremental model backing the Analyzer's results table: rows are appended one at a
 // time so the ListView only creates the new row's delegates instead of rebuilding
 // every row on each streamed result. Exposes the whole row map plus a precomputed
@@ -163,3 +165,5 @@ private:
     QTimer m_flush;
     bool m_resultsDirty = false;
 };
+
+}  // namespace sa::studio

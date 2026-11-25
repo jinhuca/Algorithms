@@ -16,6 +16,8 @@
 #  include <algorithm>
 #endif
 
+namespace ga::studio {
+
 namespace {
 #if defined(_WIN32)
     inline quint64 toU64(const FILETIME& f) {
@@ -161,3 +163,5 @@ void SystemMonitor::tick() {
 #endif
     emit sampled();
 }
+
+}  // namespace ga::studio

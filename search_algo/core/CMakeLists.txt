@@ -32,7 +32,8 @@ endif()
 if (_se_python_ok)
     add_custom_target(se_header_sync_check ALL
         COMMAND ${Python3_EXECUTABLE} -I
-                "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/gen_se_hpp.py" --check
+                "${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/gen_hpp.py"
+                --project "${CMAKE_CURRENT_SOURCE_DIR}/.." --ns se --check
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.."
         COMMENT "Checking core/include/se/*.hpp are in sync with their .ixx"
         VERBATIM)

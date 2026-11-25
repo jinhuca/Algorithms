@@ -9,6 +9,8 @@
 // cones, so the 3D view scales to large graphs without a Model (delegate) per
 // node/edge. QML computes a flat float array (14 per instance) and hands it over;
 // adding/removing/clearing is just a cheap buffer rebuild — no delegate churn.
+namespace ga::studio {
+
 class GraphInstanceTable : public QQuick3DInstancing {
     Q_OBJECT
     QML_ELEMENT
@@ -27,3 +29,5 @@ private:
     QByteArray m_buffer;
     int m_count = 0;
 };
+
+}  // namespace ga::studio

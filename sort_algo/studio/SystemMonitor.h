@@ -11,6 +11,8 @@
 // GPU-engine counters. `sampled()` fires every tick so the QML sparklines advance
 // even when a value is unchanged. All Win32 + PDH (psapi + pdh links). Set `active`
 // (e.g. bound to page visibility) to start/stop sampling.
+namespace sa::studio {
+
 class SystemMonitor : public QObject {
     Q_OBJECT
     QML_ELEMENT
@@ -64,3 +66,5 @@ private:
     void* m_pdhQuery = nullptr;        // PDH_HQUERY
     void* m_pdhGpu = nullptr;          // PDH_HCOUNTER ( \GPU Engine(*)\Utilization Percentage )
 };
+
+}  // namespace sa::studio

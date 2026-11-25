@@ -18,6 +18,8 @@
 #include <sa/advanced_sorts/radix.hpp>
 #include <sa/advanced_sorts/shell.hpp>
 
+namespace sa::studio {
+
 namespace {
     std::vector<double> buildArray(const QString& dist, int n, quint64 seed) {
         const std::size_t sz = static_cast<std::size_t>(n < 1 ? 1 : n);
@@ -147,3 +149,5 @@ void RaceController::resetAll() {
     for (QObject* o : m_lanes) static_cast<RaceLane*>(o)->reset();
     emit finishedChanged();
 }
+
+}  // namespace sa::studio

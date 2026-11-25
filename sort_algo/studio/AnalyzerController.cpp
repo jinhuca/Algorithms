@@ -32,6 +32,8 @@
 #include <sa/advanced_sorts/radix.hpp>
 #include <sa/advanced_sorts/shell.hpp>
 
+namespace sa::studio {
+
 AnalyzerController::AnalyzerController(QObject* parent) : QObject(parent) {
     // Coalesce resultsChanged (which drives the chart) to a few times a second so a
     // burst of fast cells can't flood the GUI with chart re-reads.
@@ -259,3 +261,5 @@ bool AnalyzerController::exportCsv(const QUrl& url) const {
     f.close();
     return true;
 }
+
+}  // namespace sa::studio

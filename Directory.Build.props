@@ -1,0 +1,37 @@
+<Project>
+  <!--
+    Applies to every MSVC (.vcxproj) build under the monorepo — including the
+    top-level Algorithms.slnx that aggregates all cores. It gives each project its
+    OWN output + intermediate directory so projects never collide in a shared
+    solution output folder.
+
+    Without this, building Algorithms.slnx fails: several cores have same-named
+    libraries (e.g. sort and search both produce gen.lib / seq.lib / bench.lib),
+    and the default solution OutDir ($(SolutionDir)$(Platform)\$(Configuration)\)
+    is shared by all projects, so those libs overwrite/lock each other (LNK1104)
+    and the parallel std-module builds step on one another.
+
+    build-msvc\ matches the repo .gitignore (build-*) and scripts/clean-builds.*.
+    Only MSBuild / Visual Studio read this file; the Qt/CMake/MinGW build ignores it.
+  -->
+  <PropertyGroup>
+    <IntDir>$(ProjectDir)build-msvc\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)build-msvc\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <!--
+    Parallel-build hardening for the aggregate solution. Debug defaulted to
+    Edit-and-Continue (/ZI), a shared mutable PDB that concurrent cl.exe processes
+    (across the many module projects + their std-module builds) fight over, which
+    cascaded into spurious errors inside std.ixx (<array> "error count exceeds 100").
+      * ProgramDatabase (/Zi)      — normal PDB, no Edit-and-Continue shared state
+      * MultiProcessorCompilation  — parallelize compilation within each project
+      * /FS                        — serialize PDB writes across parallel cl.exe
+  -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

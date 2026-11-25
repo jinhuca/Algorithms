@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c6469293-a557-40aa-9dc8-0a7316eec37f}</ProjectGuid>
+    <ProjectGuid>{c9a887e6-e323-4e7d-9466-9511528f99c3}</ProjectGuid>
     <RootNamespace>gashortpaths</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -63,7 +63,7 @@
   <!-- Shortest-path modules import ga.graph / ga.trace from the core project. -->
   <ItemGroup>
     <ProjectReference Include="..\graph\graph.vcxproj">
-      <Project>{a1111111-1111-4111-8111-111111111111}</Project>
+      <Project>{43595136-dd95-4096-9595-93a0321717eb}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

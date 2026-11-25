@@ -1,5 +1,7 @@
 #include "VisualizerController.h"
 
+#include "version.h"   // SA_APP_VERSION (generated)
+
 #include <QRegularExpression>
 #include <QStringList>
 #include <QVector>
@@ -21,6 +23,10 @@
 #include <sa/advanced_sorts/counting.hpp>
 #include <sa/advanced_sorts/radix.hpp>
 #include <sa/advanced_sorts/shell.hpp>
+
+namespace sa::studio {
+
+QString VisualizerController::appVersion() const { return QStringLiteral(SA_APP_VERSION); }
 
 VisualizerController::VisualizerController(QObject* parent) : QObject(parent) {
     generate(40, 1);   // a small demo array so the canvas isn't empty on launch
@@ -225,3 +231,5 @@ void VisualizerController::seek(int target) {
     rebuildValues(target);
     render();
 }
+
+}  // namespace sa::studio

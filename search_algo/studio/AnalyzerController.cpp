@@ -18,6 +18,8 @@
 #include <se/sorted_searches/interpolation.hpp>
 #include <se/sorted_searches/fibonacci.hpp>
 
+namespace se::studio {
+
 AnalyzerController::AnalyzerController(QObject* parent) : QObject(parent) {
     // Coalesce resultsChanged (which drives the chart) to a few times a second.
     m_flush.setInterval(200);
@@ -210,3 +212,5 @@ bool AnalyzerController::exportCsv(const QUrl& url) const {
     f.close();
     return true;
 }
+
+}  // namespace se::studio

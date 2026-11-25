@@ -6,6 +6,11 @@ import QtQuick.Window
 import SearchStudio
 import UiKit
 
+// Standalone window chrome for Search Algorithm Studio: a frameless ApplicationWindow
+// that owns the title bar, theme and saved geometry, and hosts the studio content
+// (SearchRoot). The same SearchRoot is embedded by the Algorithms umbrella, which
+// supplies its own window and title bar — so all studio behaviour lives in SearchRoot
+// and only the window shell is duplicated here.
 ApplicationWindow {
     id: win
     visible: true
@@ -16,22 +21,8 @@ ApplicationWindow {
     color: Theme.windowBg
     flags: Qt.Window | Qt.FramelessWindowHint
 
-    // Which workspace is on screen.
-    property string page: "home"
-    function goHome()         { win.stopPlay(); win.page = "home"; }
-    function showVisualizer() { win.page = "visualizer"; }
-    function showAnalyzer()   { win.stopPlay(); win.page = "analyzer"; }
-    function showKnowledge()  { win.stopPlay(); win.page = "knowledge"; }
-
-    // Theme + visualizer view state.
     property string themeName: "dark"
-    property bool showValues: false
-    property bool showPseudocode: true
     property bool _maxed: false
-
-    // Playback clock. Speed (steps/sec) is the source of truth; the run bar reads it.
-    property real playSpeed: 4
-    function stopPlay() { player.running = false; }
 
     Settings {
         property alias winX: win.x
@@ -39,9 +30,6 @@ ApplicationWindow {
         property alias winWidth: win.width
         property alias winHeight: win.height
         property alias themeName: win.themeName
-        property alias showValues: win.showValues
-        property alias showPseudocode: win.showPseudocode
-        property alias playSpeed: win.playSpeed
     }
 
     Binding { target: UiPalette; property: "themeName"; value: win.themeName }
@@ -55,19 +43,6 @@ ApplicationWindow {
     palette.highlight: Theme.accent
     palette.highlightedText: "#ffffff"
     palette.mid: Theme.panelBorder
-
-    VisualizerController { id: ctl }
-    AnalyzerController { id: analyzer }
-
-    Timer {
-        id: player
-        interval: Math.round(1000 / win.playSpeed)
-        repeat: true
-        onTriggered: {
-            ctl.stepForward();
-            if (ctl.atEnd) running = false;
-        }
-    }
 
     function toggleMaximize() { if (_maxed) { showNormal(); _maxed = false; } else { showMaximized(); _maxed = true; } }
 
@@ -103,12 +78,9 @@ ApplicationWindow {
     Component.onCompleted: ensureOnScreen()   // rescue an off-screen restored position
 
     header: TitleBar {
-        title: win.page === "analyzer" ? "Search Algorithm Analyzer"
-             : win.page === "visualizer" ? "Search Algorithm Visualizer"
-             : win.page === "knowledge" ? "Search Knowledge Base"
-             : "Search Algorithm Studio"
+        title: root.pageTitle
         version: Qt.application.version
-        page: win.page
+        page: root.page
         themeName: win.themeName
         themeNames: UiPalette.themeNames
         maximized: win._maxed
@@ -116,7 +88,7 @@ ApplicationWindow {
         onMaximizeToggled: win.toggleMaximize()
         onMinimizeRequested: win.showMinimized()
         onCloseRequested: win.close()
-        onHomeRequested: win.goHome()
+        onHomeRequested: root.goHome()
         onThemeSelected: (name) => win.themeName = name
     }
 
@@ -133,33 +105,9 @@ ApplicationWindow {
                     cursorShape: Qt.SizeFDiagCursor; onPressed: win.startSystemResize(Qt.RightEdge | Qt.BottomEdge) }
     }
 
-    // ---- workspaces ----
-    HomePage {
-        anchors.fill: parent; anchors.margins: 12
-        visible: win.page === "home"
-        onAnalyzerRequested: win.showAnalyzer()
-        onVisualizerRequested: win.showVisualizer()
-        onKnowledgeRequested: win.showKnowledge()
-    }
-
-    VisualizerPage {
-        anchors.fill: parent; anchors.margins: 12
-        visible: win.page === "visualizer"
-        win: win; ctl: ctl; player: player
-    }
-
-    AnalyzerPage {
-        id: analyzerPage
-        anchors.fill: parent; anchors.margins: 12
-        visible: win.page === "analyzer"
-        ctl: analyzer
-        win: win
-    }
-
-    KnowledgePage {
-        anchors.fill: parent; anchors.margins: 12
-        visible: win.page === "knowledge"
-        onVisualizeRequested: (algo) => { win.stopPlay(); ctl.algorithm = algo; win.showVisualizer(); }
-        onBenchmarkRequested: (algo) => { analyzerPage.selectAlgo(algo); win.showAnalyzer(); }
+    SearchRoot {
+        id: root
+        anchors.fill: parent
+        anchors.margins: 12
     }
 }

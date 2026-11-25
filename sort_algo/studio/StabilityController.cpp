@@ -15,6 +15,8 @@
 #include <sa/efficient_sorts/quick.hpp>
 #include <sa/advanced_sorts/shell.hpp>
 
+namespace sa::studio {
+
 namespace {
     // One element: the key we sort by + its original position (0-based). A key-only
     // comparator means equal keys are "ties", so the algorithm's stability decides
@@ -95,3 +97,5 @@ void StabilityController::recompute() {
     m_keyLevels = m_levels;
     emit resultChanged();
 }
+
+}  // namespace sa::studio
